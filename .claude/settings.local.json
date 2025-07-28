@@ -11,7 +11,8 @@
 			"Bash(bun:*)",
 			"Bash(sed:*)",
 			"Bash(git add:*)",
-			"Bash(rg:*)"
+			"Bash(rg:*)",
+			"Bash(ls:*)"
 		],
 		"deny": []
 	}

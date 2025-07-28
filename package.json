@@ -1,6 +1,6 @@
 {
 	"name": "@theventures/caret",
-	"version": "0.0.1",
+	"version": "0.0.3",
 	"description": "Unofficial Node.js API client for the Caret HTTP API",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
@@ -19,7 +19,7 @@
 		"LICENSE"
 	],
 	"scripts": {
-		"build": "bun build src/index.ts --outdir dist --target node --format esm --external typescript && bun build src/index.ts --outdir dist --target node --format cjs --outfile dist/index.js && bun tsc --declaration --emitDeclarationOnly --outDir dist",
+		"build": "bun build src/index.ts --outfile dist/index.mjs --target node --format esm && bun build src/index.ts --outfile dist/index.js --target node --format cjs && bun tsc src/index.ts --declaration --emitDeclarationOnly --outDir dist",
 		"prepublishOnly": "bun run build && bun test && bun lint",
 		"format": "biome check . --write",
 		"fix": "biome check --fix --unsafe",
