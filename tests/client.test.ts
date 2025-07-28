@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { Caret, type CaretOptions } from "../src/client.js";
 import { AuthenticationError, type CaretAPIError } from "../src/core/errors.js";
 import {
+	castMockToFetch,
 	createMockErrorResponse,
 	createMockResponse,
 } from "./__helpers__/mocks.js";
@@ -80,10 +81,12 @@ describe("Caret Client", () => {
 		test("should make successful GET request", async () => {
 			const responseData = { message: "success" };
 			let fetchCalled = false;
-			globalThis.fetch = mock(async () => {
-				fetchCalled = true;
-				return createMockResponse({ data: responseData });
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async () => {
+					fetchCalled = true;
+					return createMockResponse({ data: responseData });
+				}),
+			);
 
 			const result = await client.request("GET", "/test");
 			expect(result).toEqual(responseData);
@@ -92,10 +95,12 @@ describe("Caret Client", () => {
 
 		test("should construct URL correctly with leading slash", async () => {
 			let calledUrl = "";
-			globalThis.fetch = mock(async (url: string) => {
-				calledUrl = url;
-				return createMockResponse();
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string) => {
+					calledUrl = url;
+					return createMockResponse();
+				}),
+			);
 
 			await client.request("GET", "/test-path");
 			expect(calledUrl).toBe("https://api.caret.so/v1/test-path");
@@ -103,10 +108,12 @@ describe("Caret Client", () => {
 
 		test("should construct URL correctly without leading slash", async () => {
 			let calledUrl = "";
-			globalThis.fetch = mock(async (url: string) => {
-				calledUrl = url;
-				return createMockResponse();
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string) => {
+					calledUrl = url;
+					return createMockResponse();
+				}),
+			);
 
 			await client.request("GET", "test-path");
 			expect(calledUrl).toBe("https://api.caret.so/v1/test-path");
@@ -114,10 +121,12 @@ describe("Caret Client", () => {
 
 		test("should add query parameters", async () => {
 			let calledUrl = "";
-			globalThis.fetch = mock(async (url: string) => {
-				calledUrl = url;
-				return createMockResponse();
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string) => {
+					calledUrl = url;
+					return createMockResponse();
+				}),
+			);
 
 			await client.request("GET", "/test", {
 				params: { limit: 10, offset: 20, search: "hello world" },
@@ -130,10 +139,12 @@ describe("Caret Client", () => {
 
 		test("should skip undefined and null parameters", async () => {
 			let calledUrl = "";
-			globalThis.fetch = mock(async (url: string) => {
-				calledUrl = url;
-				return createMockResponse();
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string) => {
+					calledUrl = url;
+					return createMockResponse();
+				}),
+			);
 
 			await client.request("GET", "/test", {
 				params: { limit: 10, offset: undefined, search: null, sort: "name" },
@@ -143,12 +154,12 @@ describe("Caret Client", () => {
 		});
 
 		test("should set correct headers", async () => {
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (_url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (_url: string, options: RequestInit | undefined) => {
 					calledOptions = options as RequestInit;
 					return createMockResponse();
-				},
+				}),
 			);
 
 			await client.request("GET", "/test", {
@@ -163,12 +174,12 @@ describe("Caret Client", () => {
 		});
 
 		test("should include body for POST requests", async () => {
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (_url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (_url: string, options: RequestInit | undefined) => {
 					calledOptions = options as RequestInit;
 					return createMockResponse();
-				},
+				}),
 			);
 
 			const body = { name: "test", value: 123 };
@@ -179,12 +190,12 @@ describe("Caret Client", () => {
 		});
 
 		test("should not include body for GET requests", async () => {
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (_url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (_url: string, options: RequestInit | undefined) => {
 					calledOptions = options as RequestInit;
 					return createMockResponse();
-				},
+				}),
 			);
 
 			await client.request("GET", "/test", {
@@ -196,12 +207,12 @@ describe("Caret Client", () => {
 		});
 
 		test("should set timeout signal", async () => {
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (_url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (_url: string, options: RequestInit | undefined) => {
 					calledOptions = options as RequestInit;
 					return createMockResponse();
-				},
+				}),
 			);
 
 			await client.request("GET", "/test");
@@ -218,8 +229,8 @@ describe("Caret Client", () => {
 
 		test("should throw CaretAPIError for 400 status", async () => {
 			const errorData = { message: "Bad request" };
-			globalThis.fetch = mock(async () =>
-				createMockErrorResponse(400, errorData),
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockErrorResponse(400, errorData)),
 			);
 
 			await expect(client.request("GET", "/test")).rejects.toThrow(
@@ -229,20 +240,22 @@ describe("Caret Client", () => {
 
 		test("should throw CaretAPIError for 404 status", async () => {
 			const errorData = { message: "Not found" };
-			globalThis.fetch = mock(async () =>
-				createMockErrorResponse(404, errorData),
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockErrorResponse(404, errorData)),
 			);
 
 			await expect(client.request("GET", "/test")).rejects.toThrow("Not found");
 		});
 
 		test("should handle malformed error response JSON", async () => {
-			globalThis.fetch = mock(
-				async () =>
-					new Response("invalid json", {
-						status: 500,
-						headers: { "Content-Type": "application/json" },
-					}),
+			globalThis.fetch = castMockToFetch(
+				mock(
+					async () =>
+						new Response("invalid json", {
+							status: 500,
+							headers: { "Content-Type": "application/json" },
+						}),
+				),
 			);
 
 			await expect(client.request("GET", "/test")).rejects.toThrow();
@@ -251,8 +264,8 @@ describe("Caret Client", () => {
 		test("should include request headers in error", async () => {
 			const errorData = { message: "Unauthorized" };
 			const headers = { "X-Request-ID": "req-123" };
-			globalThis.fetch = mock(async () =>
-				createMockErrorResponse(401, errorData, headers),
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockErrorResponse(401, errorData, headers)),
 			);
 
 			try {
@@ -277,15 +290,17 @@ describe("Caret Client", () => {
 			});
 			let callCount = 0;
 
-			globalThis.fetch = mock(async () => {
-				callCount++;
-				if (callCount <= 2) {
-					return createMockErrorResponse(429, {
-						message: "Rate limited",
-					});
-				}
-				return successResponse;
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async () => {
+					callCount++;
+					if (callCount <= 2) {
+						return createMockErrorResponse(429, {
+							message: "Rate limited",
+						});
+					}
+					return successResponse;
+				}),
+			);
 
 			const result = await client.request("GET", "/test");
 			expect(result).toEqual({ success: true });
@@ -298,13 +313,15 @@ describe("Caret Client", () => {
 			});
 			let callCount = 0;
 
-			globalThis.fetch = mock(async () => {
-				callCount++;
-				if (callCount <= 1) {
-					throw new Error("Network error");
-				}
-				return successResponse;
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async () => {
+					callCount++;
+					if (callCount <= 1) {
+						throw new Error("Network error");
+					}
+					return successResponse;
+				}),
+			);
 
 			const result = await client.request("GET", "/test");
 			expect(result).toEqual({ success: true });
@@ -313,10 +330,12 @@ describe("Caret Client", () => {
 
 		test("should stop retrying after maxRetries attempts", async () => {
 			let callCount = 0;
-			globalThis.fetch = mock(async () => {
-				callCount++;
-				throw new Error("Persistent network error");
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async () => {
+					callCount++;
+					throw new Error("Persistent network error");
+				}),
+			);
 
 			await expect(client.request("GET", "/test")).rejects.toThrow(
 				"Persistent network error",
@@ -326,10 +345,12 @@ describe("Caret Client", () => {
 
 		test("should not retry on non-retriable errors", async () => {
 			let callCount = 0;
-			globalThis.fetch = mock(async () => {
-				callCount++;
-				return createMockErrorResponse(400, { message: "Bad request" });
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async () => {
+					callCount++;
+					return createMockErrorResponse(400, { message: "Bad request" });
+				}),
+			);
 
 			await expect(client.request("GET", "/test")).rejects.toThrow(
 				"Bad request",
@@ -347,13 +368,13 @@ describe("Caret Client", () => {
 
 		test("get() should call request with GET method", async () => {
 			let calledUrl = "";
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string, options: RequestInit | undefined) => {
 					calledUrl = url;
 					calledOptions = options as RequestInit;
 					return createMockResponse({ data: { success: true } });
-				},
+				}),
 			);
 
 			await client.get("/test", { params: { id: "123" } });
@@ -363,12 +384,12 @@ describe("Caret Client", () => {
 		});
 
 		test("post() should call request with POST method", async () => {
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (_url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (_url: string, options: RequestInit | undefined) => {
 					calledOptions = options as RequestInit;
 					return createMockResponse({ data: { success: true } });
-				},
+				}),
 			);
 
 			const body = { name: "test" };
@@ -379,12 +400,12 @@ describe("Caret Client", () => {
 		});
 
 		test("patch() should call request with PATCH method", async () => {
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (_url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (_url: string, options: RequestInit | undefined) => {
 					calledOptions = options as RequestInit;
 					return createMockResponse({ data: { success: true } });
-				},
+				}),
 			);
 
 			const body = { name: "updated" };
@@ -395,12 +416,12 @@ describe("Caret Client", () => {
 		});
 
 		test("put() should call request with PUT method", async () => {
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (_url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (_url: string, options: RequestInit | undefined) => {
 					calledOptions = options as RequestInit;
 					return createMockResponse({ data: { success: true } });
-				},
+				}),
 			);
 
 			const body = { name: "replaced" };
@@ -411,12 +432,12 @@ describe("Caret Client", () => {
 		});
 
 		test("delete() should call request with DELETE method", async () => {
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (_url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (_url: string, options: RequestInit | undefined) => {
 					calledOptions = options as RequestInit;
 					return createMockResponse({ data: { success: true } });
-				},
+				}),
 			);
 
 			await client.delete("/test");

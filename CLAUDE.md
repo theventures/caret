@@ -13,6 +13,8 @@ This is an unofficial Node.js API client for the Caret HTTP API (https://docs.ca
 - **TypeScript compilation check**: `bun tsc --noEmit`
 - **Run tests**: `bun test`
 - **Format and lint code**: `bun format`
+- **Build for distribution**: `bun run build`
+- **Publish to npm**: `bun publish`
 
 ## API Client Architecture
 
@@ -157,3 +159,13 @@ bun test                   # Run all tests
 - Never ignore or suppress lint warnings without valid technical reasons
 - Ensure all code passes Biome formatting checks before committing
 - Maintain consistent import ordering and code organization
+
+## Publishing to npm
+
+This package is published as `@theventures/caret` on npm by TheVentures, the investment company behind At Inc. (the company that operates Caret).
+
+### Publishing Information
+- **Package name**: `@theventures/caret`
+- **Author**: TheVentures
+- **License**: MIT
+- **Repository**: https://github.com/theventures/caret

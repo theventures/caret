@@ -1,17 +1,18 @@
 {
-  "permissions": {
-    "allow": [
-      "WebFetch(domain:docs.caret.so)",
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:github.com)",
-      "Bash(bun tsc:*)",
-      "Bash(bun test:*)",
-      "Bash(find:*)",
-      "Bash(git commit:*)",
-      "Bash(bun:*)",
-      "Bash(sed:*)",
-      "Bash(git add:*)"
-    ],
-    "deny": []
-  }
+	"permissions": {
+		"allow": [
+			"WebFetch(domain:docs.caret.so)",
+			"WebFetch(domain:raw.githubusercontent.com)",
+			"WebFetch(domain:github.com)",
+			"Bash(bun tsc:*)",
+			"Bash(bun test:*)",
+			"Bash(find:*)",
+			"Bash(git commit:*)",
+			"Bash(bun:*)",
+			"Bash(sed:*)",
+			"Bash(git add:*)",
+			"Bash(rg:*)"
+		],
+		"deny": []
+	}
 }

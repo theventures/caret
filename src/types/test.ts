@@ -4,7 +4,7 @@ import type { Mock } from "bun:test";
 
 // Mock function that returns a fetch-compatible function
 export type MockFetch = Mock<
-	(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+	(input: string | URL, init?: RequestInit) => Promise<Response>
 >;
 
 // Type for Bun's mock function return type

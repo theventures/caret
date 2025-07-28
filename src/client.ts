@@ -74,7 +74,7 @@ export class Caret {
 			requestOptions.body = JSON.stringify(options.body);
 		}
 
-		let lastError: Error;
+		let lastError: Error | undefined;
 
 		for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
 			try {
@@ -102,7 +102,7 @@ export class Caret {
 					);
 				}
 
-				return await response.json();
+				return (await response.json()) as ResponseBody;
 			} catch (error) {
 				lastError = error as Error;
 
@@ -126,7 +126,7 @@ export class Caret {
 			}
 		}
 
-		throw lastError;
+		throw lastError || new Error("Request failed after all retries");
 	}
 
 	get(

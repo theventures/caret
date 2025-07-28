@@ -1,15 +1,56 @@
 {
 	"name": "@theventures/caret",
-	"module": "src/index.ts",
+	"version": "1.0.0",
+	"description": "Unofficial Node.js API client for the Caret HTTP API",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
 	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
 	"scripts": {
+		"build": "bun build src/index.ts --outdir dist --target node --format esm --external typescript && bun build src/index.ts --outdir dist --target node --format cjs --outfile dist/index.js && bun tsc --declaration --emitDeclarationOnly --outDir dist",
+		"prepublishOnly": "bun run build && bun test && bun lint",
 		"format": "biome check . --write",
 		"fix": "biome check --fix --unsafe",
 		"lint": "biome check ."
 	},
+	"keywords": [
+		"caret",
+		"api",
+		"sdk",
+		"typescript",
+		"meeting",
+		"transcription",
+		"notes"
+	],
+	"author": "TheVentures",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/theventures/caret"
+	},
+	"homepage": "https://github.com/theventures/caret#readme",
+	"bugs": {
+		"url": "https://github.com/theventures/caret/issues"
+	},
+	"engines": {
+		"node": ">=18"
+	},
 	"devDependencies": {
 		"@biomejs/biome": "2.1.2",
-		"@types/bun": "latest"
+		"@types/bun": "latest",
+		"typescript": "^5"
 	},
 	"peerDependencies": {
 		"typescript": "^5"

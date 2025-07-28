@@ -6,6 +6,7 @@ import type {
 	NoteUpdateParams,
 } from "../../src/types/note.js";
 import {
+	castMockToFetch,
 	createMockErrorResponse,
 	createMockResponse,
 	sampleNote,
@@ -29,8 +30,8 @@ describe("Notes Resource", () => {
 
 	describe("list()", () => {
 		test("should list notes with default parameters", async () => {
-			globalThis.fetch = mock(async () =>
-				createMockResponse({ data: sampleNotesListResponse }),
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockResponse({ data: sampleNotesListResponse })),
 			);
 
 			const result = await notes.list();
@@ -40,10 +41,12 @@ describe("Notes Resource", () => {
 
 		test("should list notes with query parameters", async () => {
 			let calledUrl = "";
-			globalThis.fetch = mock(async (url: string) => {
-				calledUrl = url;
-				return createMockResponse({ data: sampleNotesListResponse });
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string) => {
+					calledUrl = url;
+					return createMockResponse({ data: sampleNotesListResponse });
+				}),
+			);
 
 			const params: NotesListParams = {
 				limit: 20,
@@ -70,10 +73,12 @@ describe("Notes Resource", () => {
 
 		test("should list notes with partial parameters", async () => {
 			let calledUrl = "";
-			globalThis.fetch = mock(async (url: string) => {
-				calledUrl = url;
-				return createMockResponse({ data: sampleNotesListResponse });
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string) => {
+					calledUrl = url;
+					return createMockResponse({ data: sampleNotesListResponse });
+				}),
+			);
 
 			const params: NotesListParams = {
 				limit: 5,
@@ -91,10 +96,12 @@ describe("Notes Resource", () => {
 
 		test("should handle empty parameters", async () => {
 			let calledUrl = "";
-			globalThis.fetch = mock(async (url: string) => {
-				calledUrl = url;
-				return createMockResponse({ data: sampleNotesListResponse });
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string) => {
+					calledUrl = url;
+					return createMockResponse({ data: sampleNotesListResponse });
+				}),
+			);
 
 			const result = await notes.list({});
 
@@ -104,8 +111,8 @@ describe("Notes Resource", () => {
 
 		test("should handle API errors", async () => {
 			const errorData = { message: "Unauthorized" };
-			globalThis.fetch = mock(async () =>
-				createMockErrorResponse(401, errorData),
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockErrorResponse(401, errorData)),
 			);
 
 			await expect(notes.list()).rejects.toThrow("Unauthorized");
@@ -120,8 +127,8 @@ describe("Notes Resource", () => {
 					isLast: true,
 				},
 			};
-			globalThis.fetch = mock(async () =>
-				createMockResponse({ data: emptyResponse }),
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockResponse({ data: emptyResponse })),
 			);
 
 			const result = await notes.list();
@@ -135,10 +142,12 @@ describe("Notes Resource", () => {
 		test("should get note by ID", async () => {
 			const responseData = { note: sampleNote };
 			let calledUrl = "";
-			globalThis.fetch = mock(async (url: string) => {
-				calledUrl = url;
-				return createMockResponse({ data: responseData });
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string) => {
+					calledUrl = url;
+					return createMockResponse({ data: responseData });
+				}),
+			);
 
 			const result = await notes.get("note_123");
 
@@ -149,10 +158,12 @@ describe("Notes Resource", () => {
 		test("should handle special characters in note ID", async () => {
 			const responseData = { note: sampleNote };
 			let calledUrl = "";
-			globalThis.fetch = mock(async (url: string) => {
-				calledUrl = url;
-				return createMockResponse({ data: responseData });
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string) => {
+					calledUrl = url;
+					return createMockResponse({ data: responseData });
+				}),
+			);
 
 			const noteId = "note_with-special.chars_123";
 			const result = await notes.get(noteId);
@@ -165,8 +176,8 @@ describe("Notes Resource", () => {
 
 		test("should handle 404 error for non-existent note", async () => {
 			const errorData = { message: "Note not found" };
-			globalThis.fetch = mock(async () =>
-				createMockErrorResponse(404, errorData),
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockErrorResponse(404, errorData)),
 			);
 
 			await expect(notes.get("non_existent_note")).rejects.toThrow(
@@ -176,10 +187,12 @@ describe("Notes Resource", () => {
 
 		test("should handle empty note ID", async () => {
 			let calledUrl = "";
-			globalThis.fetch = mock(async (url: string) => {
-				calledUrl = url;
-				return createMockResponse({ data: { note: sampleNote } });
-			});
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string) => {
+					calledUrl = url;
+					return createMockResponse({ data: { note: sampleNote } });
+				}),
+			);
 
 			await notes.get("");
 
@@ -192,13 +205,13 @@ describe("Notes Resource", () => {
 			const updatedNote = { ...sampleNote, title: "Updated Meeting Notes" };
 			const responseData = { note: updatedNote };
 			let calledUrl = "";
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string, options: RequestInit | undefined) => {
 					calledUrl = url;
 					calledOptions = options as RequestInit;
 					return createMockResponse({ data: responseData });
-				},
+				}),
 			);
 
 			const updateParams: NoteUpdateParams = {
@@ -219,12 +232,12 @@ describe("Notes Resource", () => {
 		test("should update note with partial parameters", async () => {
 			const updatedNote = { ...sampleNote, title: "New Title" };
 			const responseData = { note: updatedNote };
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (_url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (_url: string, options: RequestInit | undefined) => {
 					calledOptions = options as RequestInit;
 					return createMockResponse({ data: responseData });
-				},
+				}),
 			);
 
 			const updateParams: NoteUpdateParams = {
@@ -241,12 +254,12 @@ describe("Notes Resource", () => {
 		test("should update note visibility", async () => {
 			const updatedNote = { ...sampleNote, visibility: "shared" as const };
 			const responseData = { note: updatedNote };
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (_url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (_url: string, options: RequestInit | undefined) => {
 					calledOptions = options as RequestInit;
 					return createMockResponse({ data: responseData });
-				},
+				}),
 			);
 
 			const updateParams: NoteUpdateParams = {
@@ -263,12 +276,12 @@ describe("Notes Resource", () => {
 		test("should update note tags", async () => {
 			const updatedNote = { ...sampleNote };
 			const responseData = { note: updatedNote };
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (_url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (_url: string, options: RequestInit | undefined) => {
 					calledOptions = options as RequestInit;
 					return createMockResponse({ data: responseData });
-				},
+				}),
 			);
 
 			const updateParams: NoteUpdateParams = {
@@ -284,12 +297,12 @@ describe("Notes Resource", () => {
 
 		test("should handle empty update parameters", async () => {
 			const responseData = { note: sampleNote };
-			let calledOptions: RequestInit;
-			globalThis.fetch = mock(
-				async (_url: string, options: RequestInit | undefined) => {
+			let calledOptions: RequestInit = {};
+			globalThis.fetch = castMockToFetch(
+				mock(async (_url: string, options: RequestInit | undefined) => {
 					calledOptions = options as RequestInit;
 					return createMockResponse({ data: responseData });
-				},
+				}),
 			);
 
 			const updateParams: NoteUpdateParams = {};
@@ -303,8 +316,8 @@ describe("Notes Resource", () => {
 
 		test("should handle 404 error for non-existent note", async () => {
 			const errorData = { message: "Note not found" };
-			globalThis.fetch = mock(async () =>
-				createMockErrorResponse(404, errorData),
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockErrorResponse(404, errorData)),
 			);
 
 			const updateParams: NoteUpdateParams = { title: "New Title" };
@@ -322,8 +335,8 @@ describe("Notes Resource", () => {
 					visibility: "Invalid visibility value",
 				},
 			};
-			globalThis.fetch = mock(async () =>
-				createMockErrorResponse(422, errorData),
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockErrorResponse(422, errorData)),
 			);
 
 			const updateParams: NoteUpdateParams = { title: "" };
@@ -337,13 +350,14 @@ describe("Notes Resource", () => {
 	describe("Notes Resource Integration", () => {
 		test("should be properly initialized by client", () => {
 			expect(notes).toBeInstanceOf(Notes);
-			expect(notes._client).toBe(client);
+			expect((notes as unknown as { _client: Caret })._client).toBe(client);
 		});
 
 		test("should inherit from APIResource", async () => {
-			expect(notes._client).toBeDefined();
-			expect(typeof notes._client.get).toBe("function");
-			expect(typeof notes._client.patch).toBe("function");
+			const notesWithClient = notes as unknown as { _client: Caret };
+			expect(notesWithClient._client).toBeDefined();
+			expect(typeof notesWithClient._client.get).toBe("function");
+			expect(typeof notesWithClient._client.patch).toBe("function");
 		});
 	});
 });

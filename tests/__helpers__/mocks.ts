@@ -83,6 +83,11 @@ export function mockFetch(
 	return mock(() => response) as MockFetch;
 }
 
+// Helper to cast mock to fetch type for assignments
+export function castMockToFetch(mockFn: unknown): typeof fetch {
+	return mockFn as unknown as typeof fetch;
+}
+
 export function mockFetchWithDelay(
 	response: Response,
 	delay: number = 100,
