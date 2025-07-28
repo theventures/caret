@@ -66,7 +66,7 @@ const caret = new Caret({
 ```
 
 ### 4. Method Naming Conventions
-- Consistent CRUD operations: `create()`, `retrieve()`, `update()`, `list()`, `delete()`
+- Consistent CRUD operations: `create()`, `get()`, `update()`, `list()`, `delete()`
 - Resource-specific methods following REST patterns
 
 ## API Models
