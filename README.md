@@ -175,3 +175,7 @@ For issues with this library:
 ## About
 
 This package is published by [TheVentures](https://theventures.vc), the investment company behind [At Inc.](https://www.at.studio) (the company that operates Caret).
+
+### Built with AI
+
+This library was built entirely through **vibe coding**. The entire codebase was developed primarily using [Claude Code](https://claude.ai/code), demonstrating the power of AI-assisted development in creating production-ready software.
