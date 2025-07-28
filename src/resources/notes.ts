@@ -1,3 +1,4 @@
+import { NotFoundError } from "../core/errors.js";
 import { APIResource } from "../core/resource.js";
 import type {
 	Note,
@@ -20,11 +21,18 @@ export class Notes extends APIResource {
 	/**
 	 * Get a specific note by ID
 	 */
-	async get(id: string): Promise<Note> {
-		const response = (await this._client.get(
-			`/notes/${id}`,
-		)) as unknown as NoteResponse;
-		return response.note;
+	async get(id: string): Promise<Note | null> {
+		try {
+			const response = (await this._client.get(
+				`/notes/${id}`,
+			)) as unknown as NoteResponse;
+			return response.note;
+		} catch (error) {
+			if (error instanceof NotFoundError) {
+				return null;
+			}
+			throw error;
+		}
 	}
 
 	/**

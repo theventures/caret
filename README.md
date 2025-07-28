@@ -40,7 +40,9 @@ console.log(notes);
 
 // Get a specific note
 const note = await caret.notes.get('note_id');
-console.log(note);
+if (note) {
+  console.log(note);
+}
 ```
 
 ## Authentication
@@ -115,18 +117,22 @@ The library provides specific error types for different API error conditions:
 
 ```typescript
 import { 
-  CaretAPIError, 
-  RateLimitError, 
   AuthenticationError,
-  NotFoundError 
+  CaretAPIError, 
+  RateLimitError,
 } from '@theventures/caret';
 
+// Note: notes.get() returns null for 404 errors instead of throwing
+const note = await caret.notes.get('invalid_id');
+if (note === null) {
+  console.log('Note not found');
+}
+
+// Other methods still throw errors as expected
 try {
-  const note = await caret.notes.get('invalid_id');
+  const notes = await caret.notes.list();
 } catch (error) {
-  if (error instanceof NotFoundError) {
-    console.log('Note not found');
-  } else if (error instanceof RateLimitError) {
+  if (error instanceof RateLimitError) {
     console.log('Rate limit exceeded');
   } else if (error instanceof AuthenticationError) {
     console.log('Invalid API key');
@@ -143,8 +149,10 @@ This library is written in TypeScript and provides comprehensive type definition
 ```typescript
 import type { Note, NoteStatus, NoteVisibility } from '@theventures/caret';
 
-const note: Note = await caret.notes.get('note_id');
-console.log(note.title); // Fully typed
+const note: Note | null = await caret.notes.get('note_id');
+if (note) {
+  console.log(note.title); // Fully typed
+}
 ```
 
 ## Requirements

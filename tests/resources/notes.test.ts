@@ -174,15 +174,24 @@ describe("Notes Resource", () => {
 			);
 		});
 
-		test("should handle 404 error for non-existent note", async () => {
+		test("should return null for non-existent note (404)", async () => {
 			const errorData = { message: "Note not found" };
 			globalThis.fetch = castMockToFetch(
 				mock(async () => createMockErrorResponse(404, errorData)),
 			);
 
-			await expect(notes.get("non_existent_note")).rejects.toThrow(
-				"Note not found",
+			const result = await notes.get("non_existent_note");
+
+			expect(result).toBe(null);
+		});
+
+		test("should still throw other errors (non-404)", async () => {
+			const errorData = { message: "Unauthorized" };
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockErrorResponse(401, errorData)),
 			);
+
+			await expect(notes.get("some_note")).rejects.toThrow("Unauthorized");
 		});
 
 		test("should handle empty note ID", async () => {
