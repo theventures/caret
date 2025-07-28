@@ -38,7 +38,8 @@ export class Caret {
       headers?: Record<string, string>;
     } = {}
   ): Promise<any> {
-    const url = new URL(path.startsWith('/') ? path.slice(1) : path, this.baseURL);
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    const url = new URL(cleanPath, this.baseURL.endsWith('/') ? this.baseURL : this.baseURL + '/');
     
     if (options.params) {
       Object.entries(options.params).forEach(([key, value]) => {

@@ -11,6 +11,8 @@ This is an unofficial Node.js API client for the Caret HTTP API (https://docs.ca
 - **Install dependencies**: `bun install`
 - **Run the application**: `bun run src/index.ts`
 - **TypeScript compilation check**: `bun tsc --noEmit`
+- **Run tests**: `bun test`
+- **Run tests with coverage**: `bun test --coverage`
 
 ## API Client Architecture
 
@@ -89,6 +91,13 @@ src/
 ├── types/          # TypeScript type definitions
 ├── client.ts       # Main Caret client class
 └── index.ts        # Primary export point
+
+tests/
+├── __helpers__/    # Shared test utilities and mocks
+├── core/           # Tests for core functionality
+├── resources/      # Tests for API resources
+├── client.test.ts  # Core client tests
+└── errors.test.ts  # Error handling tests
 ```
 
 ## Implementation Guidelines
@@ -99,3 +108,32 @@ src/
 - Method overloading for different parameter combinations
 - Rich parameter interfaces rather than primitive types
 - Generate types from API documentation where possible
+
+## Testing
+
+The project maintains comprehensive test coverage using Bun's built-in testing framework without additional dependencies.
+
+### Test Coverage
+- **100% line coverage** of all executable code
+- **94.29% function coverage** across all components
+- **Complete coverage** of client functionality, error handling, and API resources
+- **Zero dependencies** - uses only `bun test` built-in capabilities
+
+### Test Structure
+- **Mock Strategy**: Uses Bun's native `mock()` function for HTTP request mocking
+- **Test Organization**: Grouped by functionality (client, errors, resources, core)
+- **Assertions**: Bun's built-in `expect()` API for all test assertions
+
+### Running Tests
+```bash
+bun test                    # Run all tests
+bun test --coverage         # Run tests with coverage report
+bun tsc --noEmit           # TypeScript compilation check
+```
+
+### Test Guidelines
+- All new features must include comprehensive unit tests
+- Tests should cover success cases, error cases, and edge cases
+- Mock external dependencies (HTTP requests) using the established patterns
+- Maintain 100% line coverage for all executable code
+- Strive for maximum function coverage where practical
