@@ -12,7 +12,7 @@ This is an unofficial Node.js API client for the Caret HTTP API (https://docs.ca
 - **Run the application**: `bun run src/index.ts`
 - **TypeScript compilation check**: `bun tsc --noEmit`
 - **Run tests**: `bun test`
-- **Run tests with coverage**: `bun test --coverage`
+- **Format and lint code**: `bun format`
 
 ## API Client Architecture
 
@@ -114,8 +114,6 @@ tests/
 The project maintains comprehensive test coverage using Bun's built-in testing framework without additional dependencies.
 
 ### Test Coverage
-- **100% line coverage** of all executable code
-- **94.29% function coverage** across all components
 - **Complete coverage** of client functionality, error handling, and API resources
 - **Zero dependencies** - uses only `bun test` built-in capabilities
 
@@ -127,7 +125,6 @@ The project maintains comprehensive test coverage using Bun's built-in testing f
 ### Running Tests
 ```bash
 bun test                    # Run all tests
-bun test --coverage         # Run tests with coverage report
 bun tsc --noEmit           # TypeScript compilation check
 ```
 
@@ -137,3 +134,26 @@ bun tsc --noEmit           # TypeScript compilation check
 - Mock external dependencies (HTTP requests) using the established patterns
 - Maintain 100% line coverage for all executable code
 - Strive for maximum function coverage where practical
+
+## Code Quality and Formatting
+
+The project uses Biome as the primary linter and formatter for consistent code style and quality.
+
+### Code Quality Requirements
+- **ALWAYS run `bun format`** after making any code changes to ensure proper formatting and linting
+- **All lint warnings must be resolved** using the correct approach rather than being ignored or suppressed
+- Follow Biome's formatting rules for TypeScript, imports, and code structure
+- Maintain consistent code style across all files
+
+### Quality Checks
+```bash
+bun format                  # Format code and check for lint issues
+bun tsc --noEmit           # TypeScript compilation check
+bun test                   # Run all tests
+```
+
+### Quality Guidelines
+- Fix lint warnings properly by addressing the underlying issues
+- Never ignore or suppress lint warnings without valid technical reasons
+- Ensure all code passes Biome formatting checks before committing
+- Maintain consistent import ordering and code organization

@@ -1,7 +1,10 @@
-declare global {
-  namespace globalThis {
-    var fetch: any;
-  }
-}
+import type { Mock } from "bun:test";
 
-export {};
+declare global {
+	namespace globalThis {
+		// Mock fetch type for Bun testing framework compatibility
+		var fetch: Mock<
+			(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+		>;
+	}
+}

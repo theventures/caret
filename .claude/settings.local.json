@@ -6,7 +6,11 @@
       "WebFetch(domain:github.com)",
       "Bash(bun tsc:*)",
       "Bash(bun test:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git commit:*)",
+      "Bash(bun:*)",
+      "Bash(sed:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }

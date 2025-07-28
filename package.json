@@ -1,11 +1,17 @@
 {
-  "name": "@theventures/caret",
-  "module": "src/index.ts",
-  "type": "module",
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  }
+	"name": "@theventures/caret",
+	"module": "src/index.ts",
+	"type": "module",
+	"scripts": {
+		"format": "biome check . --write",
+		"fix": "biome check --fix --unsafe",
+		"lint": "biome check ."
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.1.2",
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
 }

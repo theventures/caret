@@ -1,9 +1,9 @@
-import type { Caret } from '../client.js';
+import type { Caret } from "../client.js";
 
 export abstract class APIResource {
-  protected _client: Caret;
+	protected _client: Caret;
 
-  constructor(client: Caret) {
-    this._client = client;
-  }
+	constructor(client: Caret) {
+		this._client = client;
+	}
 }

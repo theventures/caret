@@ -1,28 +1,28 @@
-export { Caret } from './client.js';
-export type { CaretOptions } from './client.js';
-export { Notes } from './resources/notes.js';
-export type {
-  Note,
-  NoteTag,
-  NoteParticipant,
-  NoteTranscript,
-  NoteKind,
-  NoteStatus,
-  NoteVisibility,
-  NotesListParams,
-  NotesListResponse,
-  NoteUpdateParams,
-  NoteResponse,
-} from './types/note.js';
+export type { CaretOptions } from "./client.js";
+export { Caret } from "./client.js";
 export {
-  CaretError,
-  CaretAPIError,
-  BadRequestError,
-  AuthenticationError,
-  PermissionDeniedError,
-  NotFoundError,
-  ConflictError,
-  UnprocessableEntityError,
-  RateLimitError,
-  InternalServerError,
-} from './core/errors.js';
+	AuthenticationError,
+	BadRequestError,
+	CaretAPIError,
+	CaretError,
+	ConflictError,
+	InternalServerError,
+	NotFoundError,
+	PermissionDeniedError,
+	RateLimitError,
+	UnprocessableEntityError,
+} from "./core/errors.js";
+export { Notes } from "./resources/notes.js";
+export type {
+	Note,
+	NoteKind,
+	NoteParticipant,
+	NoteResponse,
+	NoteStatus,
+	NotesListParams,
+	NotesListResponse,
+	NoteTag,
+	NoteTranscript,
+	NoteUpdateParams,
+	NoteVisibility,
+} from "./types/note.js";
