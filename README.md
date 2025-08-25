@@ -43,6 +43,10 @@ const note = await caret.notes.get('note_id');
 if (note) {
   console.log(note);
 }
+
+// List all tags
+const tags = await caret.tags.list();
+console.log(tags);
 ```
 
 ## Authentication
@@ -101,6 +105,21 @@ const updatedNote = await caret.notes.update('note_id', {
 });
 ```
 
+### Tags
+
+The tags resource allows you to manage workspace tags.
+
+```typescript
+// List all tags in the workspace
+const tags = await caret.tags.list();
+
+// Create a new tag
+const newTag = await caret.tags.create({
+  name: 'Important',
+  color: '#FF5733'
+});
+```
+
 ## Rate Limits
 
 The client automatically handles rate limiting based on your Caret plan:
@@ -147,12 +166,17 @@ try {
 This library is written in TypeScript and provides comprehensive type definitions:
 
 ```typescript
-import type { Note, NoteStatus, NoteVisibility } from '@theventures/caret';
+import type { Note, NoteStatus, NoteVisibility, Tag } from '@theventures/caret';
 
 const note: Note | null = await caret.notes.get('note_id');
 if (note) {
   console.log(note.title); // Fully typed
 }
+
+const tags: Tag[] = await caret.tags.list();
+tags.forEach(tag => {
+  console.log(tag.name, tag.color); // Fully typed
+});
 ```
 
 ## Requirements

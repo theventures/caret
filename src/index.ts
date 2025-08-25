@@ -13,6 +13,7 @@ export {
 	UnprocessableEntityError,
 } from "./core/errors.js";
 export { Notes } from "./resources/notes.js";
+export { Tags } from "./resources/tags.js";
 export type {
 	Note,
 	NoteKind,
@@ -26,3 +27,9 @@ export type {
 	NoteUpdateParams,
 	NoteVisibility,
 } from "./types/note.js";
+export type {
+	Tag,
+	TagCreateParams,
+	TagResponse,
+	TagsListResponse,
+} from "./types/tags.js";

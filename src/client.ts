@@ -1,5 +1,6 @@
 import { CaretAPIError } from "./core/errors.js";
 import { Notes } from "./resources/notes.js";
+import { Tags } from "./resources/tags.js";
 import type { APIErrorData, ResponseBody } from "./types/common.js";
 
 export interface CaretOptions {
@@ -16,6 +17,7 @@ export class Caret {
 	readonly maxRetries: number;
 
 	notes: Notes;
+	tags: Tags;
 
 	constructor(options: CaretOptions = {}) {
 		this.apiKey = options.apiKey ?? process.env.CARET_API_KEY ?? "";
@@ -30,6 +32,7 @@ export class Caret {
 		}
 
 		this.notes = new Notes(this);
+		this.tags = new Tags(this);
 	}
 
 	async request(
