@@ -14,6 +14,7 @@ export {
 } from "./core/errors.js";
 export { Notes } from "./resources/notes.js";
 export { Tags } from "./resources/tags.js";
+export { Workspace } from "./resources/workspace.js";
 export type {
 	Note,
 	NoteKind,
@@ -33,3 +34,15 @@ export type {
 	TagResponse,
 	TagsListResponse,
 } from "./types/tags.js";
+export type {
+	Group,
+	Member,
+	MemberResponse,
+	MembersListParams,
+	MembersListResponse,
+	MemberUpdateParams,
+	Pagination,
+	Workspace as WorkspaceType,
+	WorkspaceResponse,
+	WorkspaceSettings,
+} from "./types/workspace.js";

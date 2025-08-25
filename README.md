@@ -47,6 +47,10 @@ if (note) {
 // List all tags
 const tags = await caret.tags.list();
 console.log(tags);
+
+// Get workspace details
+const workspace = await caret.workspace.get();
+console.log(workspace);
 ```
 
 ## Authentication
@@ -120,6 +124,32 @@ const newTag = await caret.tags.create({
 });
 ```
 
+### Workspace
+
+The workspace resource allows you to manage workspace settings and members.
+
+```typescript
+// Get workspace details
+const workspace = await caret.workspace.get();
+console.log(workspace.name, workspace.settings);
+
+// List workspace members with pagination
+const members = await caret.workspace.listMembers({
+  limit: 50,
+  offset: 0,
+  search: 'john'
+});
+
+// Get a specific member
+const member = await caret.workspace.getMember('member_id');
+console.log(member.name, member.role, member.groups);
+
+// Update member's group assignments
+const updatedMember = await caret.workspace.updateMember('member_id', {
+  groupIds: ['group_1', 'group_2']
+});
+```
+
 ## Rate Limits
 
 The client automatically handles rate limiting based on your Caret plan:
@@ -166,7 +196,14 @@ try {
 This library is written in TypeScript and provides comprehensive type definitions:
 
 ```typescript
-import type { Note, NoteStatus, NoteVisibility, Tag } from '@theventures/caret';
+import type { 
+  Note, 
+  NoteStatus, 
+  NoteVisibility, 
+  Tag,
+  WorkspaceType,
+  Member 
+} from '@theventures/caret';
 
 const note: Note | null = await caret.notes.get('note_id');
 if (note) {
@@ -177,6 +214,12 @@ const tags: Tag[] = await caret.tags.list();
 tags.forEach(tag => {
   console.log(tag.name, tag.color); // Fully typed
 });
+
+const workspace: WorkspaceType = await caret.workspace.get();
+console.log(workspace.settings.defaultLanguage); // Fully typed
+
+const member: Member = await caret.workspace.getMember('member_id');
+console.log(member.role, member.groups); // Fully typed
 ```
 
 ## Requirements
