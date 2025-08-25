@@ -47,6 +47,10 @@ if (note) {
 // List all tags
 const tags = await caret.tags.list();
 console.log(tags);
+
+// Get workspace details
+const workspace = await caret.workspace.get();
+console.log(workspace);
 ```
 
 ## Authentication
@@ -120,6 +124,62 @@ const newTag = await caret.tags.create({
 });
 ```
 
+### Workspace
+
+The workspace resource allows you to manage workspace settings and members.
+
+```typescript
+// Get workspace details
+const workspace = await caret.workspace.get();
+console.log(workspace.name, workspace.settings);
+
+// List workspace members with pagination
+const members = await caret.workspace.listMembers({
+  limit: 50,
+  offset: 0,
+  search: 'john'
+});
+
+// Get a specific member
+const member = await caret.workspace.getMember('member_id');
+console.log(member.name, member.role, member.groups);
+
+// Update member's group assignments
+const updatedMember = await caret.workspace.updateMember('member_id', {
+  groupIds: ['group_1', 'group_2']
+});
+
+// List all groups in the workspace
+const groups = await caret.workspace.listGroups();
+console.log(groups.map(g => ({ name: g.name, members: g.memberCount })));
+
+// Create a new group
+const newGroup = await caret.workspace.createGroup({
+  name: 'Engineering Team',
+  description: 'All engineering team members'
+});
+console.log(newGroup.id, newGroup.name);
+
+// List all invites with pagination
+const invites = await caret.workspace.listInvites({
+  limit: 50,
+  offset: 0
+});
+console.log(invites.items.map(i => ({ email: i.email, role: i.role })));
+
+// Create a new invite
+const invite = await caret.workspace.createInvite({
+  email: 'newmember@example.com',
+  role: 'member',
+  groupIds: ['group_1', 'group_2']
+});
+console.log(invite.code, invite.expiresAt);
+
+// Delete an invite
+const deleteResult = await caret.workspace.deleteInvite('invite_id');
+console.log(deleteResult.success, deleteResult.message);
+```
+
 ## Rate Limits
 
 The client automatically handles rate limiting based on your Caret plan:
@@ -166,7 +226,16 @@ try {
 This library is written in TypeScript and provides comprehensive type definitions:
 
 ```typescript
-import type { Note, NoteStatus, NoteVisibility, Tag } from '@theventures/caret';
+import type { 
+  Note, 
+  NoteStatus, 
+  NoteVisibility, 
+  Tag,
+  WorkspaceType,
+  Member,
+  Group,
+  Invite 
+} from '@theventures/caret';
 
 const note: Note | null = await caret.notes.get('note_id');
 if (note) {
@@ -177,6 +246,23 @@ const tags: Tag[] = await caret.tags.list();
 tags.forEach(tag => {
   console.log(tag.name, tag.color); // Fully typed
 });
+
+const workspace: WorkspaceType = await caret.workspace.get();
+console.log(workspace.settings.defaultLanguage); // Fully typed
+
+const member: Member = await caret.workspace.getMember('member_id');
+console.log(member.role, member.groups); // Fully typed
+
+const groups: Group[] = await caret.workspace.listGroups();
+groups.forEach(group => {
+  console.log(group.name, group.memberCount, group.description); // Fully typed
+});
+
+const invite: Invite = await caret.workspace.createInvite({
+  email: 'new@example.com',
+  role: 'member'
+});
+console.log(invite.code, invite.expiresAt, invite.groups); // Fully typed
 ```
 
 ## Requirements

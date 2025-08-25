@@ -110,6 +110,10 @@ tests/
 - Method overloading for different parameter combinations
 - Rich parameter interfaces rather than primitive types
 - Generate types from API documentation where possible
+- **IMPORTANT: Always update README.md documentation when implementing new API endpoints**
+  - Add usage examples for new endpoints
+  - Update TypeScript type examples if new types are added
+  - Ensure all new methods are documented with clear examples
 
 ## Testing
 
