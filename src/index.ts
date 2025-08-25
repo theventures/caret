@@ -35,6 +35,14 @@ export type {
 	TagsListResponse,
 } from "./types/tags.js";
 export type {
+	NoteAudioUploadedPayload,
+	NoteCreatedPayload,
+	TestPayload,
+	WebhookEvent,
+	WebhookEventMap,
+	WebhookEventType,
+} from "./types/webhooks.js";
+export type {
 	CreatedGroup,
 	Group,
 	GroupCreateParams,
@@ -57,3 +65,4 @@ export type {
 	WorkspaceResponse,
 	WorkspaceSettings,
 } from "./types/workspace.js";
+export { type VerifyRequestResult, WebhookVerifier } from "./webhooks/index.js";
