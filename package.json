@@ -19,7 +19,10 @@
 		"LICENSE"
 	],
 	"scripts": {
-		"build": "bun build src/index.ts --outfile dist/index.mjs --target node --format esm && bun build src/index.ts --outfile dist/index.js --target node --format cjs && bun tsc src/index.ts --declaration --emitDeclarationOnly --outDir dist",
+		"build": "bun run clean && bun build src/index.ts --outfile dist/index.mjs --target node --format esm && bun build src/index.ts --outfile dist/index.js --target node --format cjs && bun tsc --project tsconfig.build.json",
+		"clean": "rm -rf dist",
+		"test": "bun test",
+		"typecheck": "bun tsc --noEmit",
 		"prepublishOnly": "bun run build && bun test && bun lint",
 		"format": "biome check . --write",
 		"fix": "biome check --fix --unsafe",
@@ -50,9 +53,6 @@
 	"devDependencies": {
 		"@biomejs/biome": "2.1.2",
 		"@types/bun": "latest",
-		"typescript": "^5"
-	},
-	"peerDependencies": {
 		"typescript": "^5"
 	}
 }
