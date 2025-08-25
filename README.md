@@ -221,6 +221,36 @@ try {
 }
 ```
 
+## Webhooks
+
+The library provides helpers for verifying webhook signatures to ensure webhook authenticity.
+
+```typescript
+import { WebhookVerifier } from '@theventures/caret';
+
+// Next.js App Router example
+export async function POST(request: Request) {
+  // Uses CARET_WEBHOOK_SECRET env var automatically or you can pass it in the constructor
+  const verifier = new WebhookVerifier(); 
+  
+  // Verify and parse in one step with full type safety
+  const { isValid, data, error } = await verifier.verifyRequest<'note.created'>(request);
+  
+  if (!isValid) {
+    console.error('Webhook verification failed:', error);
+    return new Response('Unauthorized', { status: 401 });
+  }
+  
+  // data is fully typed as WebhookEventMap['note.created']
+  const note = data.payload.note; // Fully typed as Note
+  console.log('New note created:', note.title);
+  console.log('Participants:', note.participants);
+  // Process the note...
+  
+  return new Response('OK', { status: 200 });
+}
+```
+
 ## TypeScript Support
 
 This library is written in TypeScript and provides comprehensive type definitions:
@@ -234,7 +264,9 @@ import type {
   WorkspaceType,
   Member,
   Group,
-  Invite 
+  Invite,
+  WebhookEvent,
+  WebhookEventMap
 } from '@theventures/caret';
 
 const note: Note | null = await caret.notes.get('note_id');
@@ -263,6 +295,18 @@ const invite: Invite = await caret.workspace.createInvite({
   role: 'member'
 });
 console.log(invite.code, invite.expiresAt, invite.groups); // Fully typed
+
+// Webhook event types
+const webhookEvent: WebhookEventMap['note.created'] = {
+  type: 'note.created',
+  eventId: 'evt_123',
+  webhookId: 'wh_456',
+  workspaceId: 'ws_789',
+  timestamp: '2024-01-01T00:00:00Z',
+  payload: {
+    note: note! // Fully typed as Note
+  }
+};
 ```
 
 ## Requirements
