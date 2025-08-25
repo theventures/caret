@@ -12,7 +12,8 @@
 			"Bash(sed:*)",
 			"Bash(git add:*)",
 			"Bash(rg:*)",
-			"Bash(ls:*)"
+			"Bash(ls:*)",
+			"Bash(git checkout:*)"
 		],
 		"deny": []
 	}
