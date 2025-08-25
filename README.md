@@ -159,6 +159,25 @@ const newGroup = await caret.workspace.createGroup({
   description: 'All engineering team members'
 });
 console.log(newGroup.id, newGroup.name);
+
+// List all invites with pagination
+const invites = await caret.workspace.listInvites({
+  limit: 50,
+  offset: 0
+});
+console.log(invites.items.map(i => ({ email: i.email, role: i.role })));
+
+// Create a new invite
+const invite = await caret.workspace.createInvite({
+  email: 'newmember@example.com',
+  role: 'member',
+  groupIds: ['group_1', 'group_2']
+});
+console.log(invite.code, invite.expiresAt);
+
+// Delete an invite
+const deleteResult = await caret.workspace.deleteInvite('invite_id');
+console.log(deleteResult.success, deleteResult.message);
 ```
 
 ## Rate Limits
@@ -214,7 +233,8 @@ import type {
   Tag,
   WorkspaceType,
   Member,
-  Group 
+  Group,
+  Invite 
 } from '@theventures/caret';
 
 const note: Note | null = await caret.notes.get('note_id');
@@ -237,6 +257,12 @@ const groups: Group[] = await caret.workspace.listGroups();
 groups.forEach(group => {
   console.log(group.name, group.memberCount, group.description); // Fully typed
 });
+
+const invite: Invite = await caret.workspace.createInvite({
+  email: 'new@example.com',
+  role: 'member'
+});
+console.log(invite.code, invite.expiresAt, invite.groups); // Fully typed
 ```
 
 ## Requirements

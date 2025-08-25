@@ -5,6 +5,12 @@ import type {
 	GroupCreateParams,
 	GroupCreateResponse,
 	GroupsListResponse,
+	Invite,
+	InviteCreateParams,
+	InviteDeleteResponse,
+	InviteResponse,
+	InvitesListParams,
+	InvitesListResponse,
 	Member,
 	MemberResponse,
 	MembersListParams,
@@ -72,5 +78,33 @@ export class Workspace extends APIResource {
 			body: params,
 		})) as unknown as GroupCreateResponse;
 		return response.group;
+	}
+
+	/**
+	 * List all invites in the workspace
+	 */
+	async listInvites(params?: InvitesListParams): Promise<InvitesListResponse> {
+		return (await this._client.get("/workspace/invites", {
+			params: params as Record<string, unknown>,
+		})) as unknown as InvitesListResponse;
+	}
+
+	/**
+	 * Create a new invite to the workspace
+	 */
+	async createInvite(params: InviteCreateParams): Promise<Invite> {
+		const response = (await this._client.post("/workspace/invites", {
+			body: params,
+		})) as unknown as InviteResponse;
+		return response.invite;
+	}
+
+	/**
+	 * Delete an existing invite
+	 */
+	async deleteInvite(id: string): Promise<InviteDeleteResponse> {
+		return (await this._client.delete(
+			`/workspace/invites/${id}`,
+		)) as unknown as InviteDeleteResponse;
 	}
 }

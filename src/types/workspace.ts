@@ -81,3 +81,40 @@ export interface GroupCreateParams {
 export interface GroupCreateResponse {
 	group: CreatedGroup;
 }
+
+export interface Invite {
+	id: string;
+	email: string;
+	code: string;
+	role: "admin" | "member";
+	expiresAt: string;
+	createdAt: string;
+	isUrlInvite: boolean;
+	groups: GroupReference[];
+}
+
+export interface InvitesListParams {
+	limit?: number;
+	offset?: number;
+}
+
+export interface InvitesListResponse {
+	items: Invite[];
+	pagination: Pagination;
+}
+
+export interface InviteCreateParams {
+	email: string;
+	role?: "admin" | "member";
+	isUrlInvite?: boolean;
+	groupIds?: string[];
+}
+
+export interface InviteResponse {
+	invite: Invite;
+}
+
+export interface InviteDeleteResponse {
+	success: boolean;
+	message: string;
+}

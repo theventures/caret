@@ -8,6 +8,10 @@ import type {
 	Group,
 	GroupCreateParams,
 	GroupReference,
+	Invite,
+	InviteCreateParams,
+	InvitesListParams,
+	InvitesListResponse,
 	Member,
 	MembersListParams,
 	MembersListResponse,
@@ -94,6 +98,38 @@ const sampleGroupsListResponse = {
 			description: "Sales team",
 		},
 	],
+};
+
+const sampleInvite: Invite = {
+	id: "01887270-invite-id",
+	email: "newuser@acme.com",
+	code: "INV-ABC123",
+	role: "member",
+	expiresAt: "2024-02-15T10:30:00Z",
+	createdAt: "2024-01-15T10:30:00Z",
+	isUrlInvite: false,
+	groups: [{ id: "group-1", name: "Engineering" }],
+};
+
+const sampleInvitesListResponse: InvitesListResponse = {
+	items: [
+		sampleInvite,
+		{
+			id: "01887270-invite-2",
+			email: "admin@acme.com",
+			code: "INV-XYZ789",
+			role: "admin",
+			expiresAt: "2024-03-20T14:20:00Z",
+			createdAt: "2024-02-20T14:20:00Z",
+			isUrlInvite: true,
+			groups: [],
+		},
+	],
+	pagination: {
+		limit: 20,
+		nextOffset: 20,
+		isLast: false,
+	},
 };
 
 describe("Workspace Resource", () => {
@@ -721,6 +757,327 @@ describe("Workspace Resource", () => {
 
 			await expect(workspace.createGroup(createParams)).rejects.toThrow(
 				"Only admins can create groups",
+			);
+		});
+	});
+
+	describe("listInvites()", () => {
+		test("should list all invites in the workspace", async () => {
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockResponse({
+						data: sampleInvitesListResponse as unknown as ResponseBody,
+					}),
+				),
+			);
+
+			const result = await workspace.listInvites();
+
+			expect(result).toEqual(sampleInvitesListResponse);
+			expect(result.items).toHaveLength(2);
+			expect(result.pagination.limit).toBe(20);
+		});
+
+		test("should pass query parameters correctly", async () => {
+			let calledUrl = "";
+			const params: InvitesListParams = {
+				limit: 50,
+				offset: 10,
+			};
+
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string) => {
+					calledUrl = url;
+					return createMockResponse({
+						data: sampleInvitesListResponse as unknown as ResponseBody,
+					});
+				}),
+			);
+
+			await workspace.listInvites(params);
+
+			expect(calledUrl).toContain("limit=50");
+			expect(calledUrl).toContain("offset=10");
+		});
+
+		test("should call correct endpoint", async () => {
+			let calledUrl = "";
+			let calledMethod = "";
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string, options: RequestInit) => {
+					calledUrl = url;
+					calledMethod = options.method || "";
+					return createMockResponse({
+						data: sampleInvitesListResponse as unknown as ResponseBody,
+					});
+				}),
+			);
+
+			await workspace.listInvites();
+
+			expect(calledUrl).toContain("https://api.caret.so/v1/workspace/invites");
+			expect(calledMethod).toBe("GET");
+		});
+
+		test("should handle empty invites list", async () => {
+			const emptyResponse: InvitesListResponse = {
+				items: [],
+				pagination: {
+					limit: 20,
+					nextOffset: 0,
+					isLast: true,
+				},
+			};
+
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockResponse({
+						data: emptyResponse as unknown as ResponseBody,
+					}),
+				),
+			);
+
+			const result = await workspace.listInvites();
+
+			expect(result.items).toEqual([]);
+			expect(result.pagination.isLast).toBe(true);
+		});
+
+		test("should handle invites with and without groups", async () => {
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockResponse({
+						data: sampleInvitesListResponse as unknown as ResponseBody,
+					}),
+				),
+			);
+
+			const result = await workspace.listInvites();
+
+			expect(result.items[0]?.groups).toHaveLength(1);
+			expect(result.items[1]?.groups).toHaveLength(0);
+		});
+	});
+
+	describe("createInvite()", () => {
+		const createParams: InviteCreateParams = {
+			email: "newhire@acme.com",
+			role: "member",
+			isUrlInvite: false,
+			groupIds: ["group-1", "group-2"],
+		};
+
+		test("should create a new invite", async () => {
+			const newInvite: Invite = {
+				id: "01887270-new-invite",
+				email: "newhire@acme.com",
+				code: "INV-NEW123",
+				role: "member",
+				expiresAt: "2024-12-31T23:59:59Z",
+				createdAt: "2024-01-01T00:00:00Z",
+				isUrlInvite: false,
+				groups: [
+					{ id: "group-1", name: "Engineering" },
+					{ id: "group-2", name: "Leadership" },
+				],
+			};
+
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockResponse({ data: { invite: newInvite } })),
+			);
+
+			const result = await workspace.createInvite(createParams);
+
+			expect(result).toEqual(newInvite);
+			expect(result.email).toBe("newhire@acme.com");
+			expect(result.groups).toHaveLength(2);
+		});
+
+		test("should create URL invite", async () => {
+			const urlInviteParams: InviteCreateParams = {
+				email: "external@partner.com",
+				role: "member",
+				isUrlInvite: true,
+			};
+
+			const urlInvite: Invite = {
+				id: "01887270-url-invite",
+				email: "external@partner.com",
+				code: "INV-URL456",
+				role: "member",
+				expiresAt: "2024-12-31T23:59:59Z",
+				createdAt: "2024-01-01T00:00:00Z",
+				isUrlInvite: true,
+				groups: [],
+			};
+
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockResponse({ data: { invite: urlInvite } })),
+			);
+
+			const result = await workspace.createInvite(urlInviteParams);
+
+			expect(result.isUrlInvite).toBe(true);
+			expect(result.groups).toEqual([]);
+		});
+
+		test("should call correct endpoint with POST method", async () => {
+			let calledUrl = "";
+			let calledMethod = "";
+			let requestBody = "";
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string, options: RequestInit) => {
+					calledUrl = url;
+					calledMethod = options.method || "";
+					requestBody = options.body as string;
+					return createMockResponse({ data: { invite: sampleInvite } });
+				}),
+			);
+
+			await workspace.createInvite(createParams);
+
+			expect(calledUrl).toBe("https://api.caret.so/v1/workspace/invites");
+			expect(calledMethod).toBe("POST");
+			expect(JSON.parse(requestBody)).toEqual(createParams);
+		});
+
+		test("should handle validation errors", async () => {
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockErrorResponse(400, {
+						message: "Invalid email address",
+						errors: {
+							email: "Must be a valid email address",
+						},
+					}),
+				),
+			);
+
+			await expect(
+				workspace.createInvite({ email: "invalid-email" }),
+			).rejects.toThrow(BadRequestError);
+		});
+
+		test("should handle duplicate invite error", async () => {
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockErrorResponse(409, {
+						message: "An invite for this email already exists",
+					}),
+				),
+			);
+
+			await expect(
+				workspace.createInvite({ email: "existing@acme.com" }),
+			).rejects.toThrow("An invite for this email already exists");
+		});
+
+		test("should create admin invite", async () => {
+			const adminParams: InviteCreateParams = {
+				email: "admin@acme.com",
+				role: "admin",
+			};
+
+			const adminInvite: Invite = {
+				...sampleInvite,
+				email: "admin@acme.com",
+				role: "admin",
+			};
+
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockResponse({ data: { invite: adminInvite } })),
+			);
+
+			const result = await workspace.createInvite(adminParams);
+
+			expect(result.role).toBe("admin");
+		});
+	});
+
+	describe("deleteInvite()", () => {
+		const inviteId = "01887270-invite-id";
+
+		test("should delete an invite successfully", async () => {
+			const deleteResponse = {
+				success: true,
+				message: "Invite deleted successfully",
+			};
+
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockResponse({
+						data: deleteResponse as unknown as ResponseBody,
+					}),
+				),
+			);
+
+			const result = await workspace.deleteInvite(inviteId);
+
+			expect(result).toEqual(deleteResponse);
+			expect(result.success).toBe(true);
+		});
+
+		test("should call correct endpoint with DELETE method", async () => {
+			let calledUrl = "";
+			let calledMethod = "";
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string, options: RequestInit) => {
+					calledUrl = url;
+					calledMethod = options.method || "";
+					return createMockResponse({
+						data: {
+							success: true,
+							message: "Deleted",
+						} as unknown as ResponseBody,
+					});
+				}),
+			);
+
+			await workspace.deleteInvite(inviteId);
+
+			expect(calledUrl).toBe(
+				`https://api.caret.so/v1/workspace/invites/${inviteId}`,
+			);
+			expect(calledMethod).toBe("DELETE");
+		});
+
+		test("should handle not found error", async () => {
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockErrorResponse(404, { message: "Invite not found" }),
+				),
+			);
+
+			await expect(workspace.deleteInvite("invalid-id")).rejects.toThrow(
+				NotFoundError,
+			);
+		});
+
+		test("should handle already used invite", async () => {
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockErrorResponse(400, {
+						message: "Cannot delete an invite that has already been used",
+					}),
+				),
+			);
+
+			await expect(workspace.deleteInvite(inviteId)).rejects.toThrow(
+				BadRequestError,
+			);
+		});
+
+		test("should handle permission denied error", async () => {
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockErrorResponse(403, {
+						message: "Only admins can delete invites",
+					}),
+				),
+			);
+
+			await expect(workspace.deleteInvite(inviteId)).rejects.toThrow(
+				"Only admins can delete invites",
 			);
 		});
 	});
