@@ -18,10 +18,20 @@ export interface WorkspaceResponse {
 	workspace: Workspace;
 }
 
+// Full group type returned by listGroups - this is the complete definition
 export interface Group {
 	id: string;
 	name: string;
+	createdAt: string;
+	memberCount: number;
+	description?: string;
 }
+
+// Base group type used in Member responses (minimal info)
+export type GroupReference = Pick<Group, "id" | "name">;
+
+// Group type returned by createGroup (no memberCount yet)
+export type CreatedGroup = Omit<Group, "memberCount">;
 
 export interface Member {
 	id: string;
@@ -31,7 +41,7 @@ export interface Member {
 	profileUrl: string | null;
 	role: "admin" | "member";
 	createdAt: string;
-	groups: Group[];
+	groups: GroupReference[];
 }
 
 export interface MemberResponse {
@@ -57,4 +67,17 @@ export interface MembersListResponse {
 
 export interface MemberUpdateParams {
 	groupIds?: string[];
+}
+
+export interface GroupsListResponse {
+	userGroups: Group[];
+}
+
+export interface GroupCreateParams {
+	name: string;
+	description?: string;
+}
+
+export interface GroupCreateResponse {
+	group: CreatedGroup;
 }

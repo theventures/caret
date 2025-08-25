@@ -1,5 +1,10 @@
 import { APIResource } from "../core/resource.js";
 import type {
+	CreatedGroup,
+	Group,
+	GroupCreateParams,
+	GroupCreateResponse,
+	GroupsListResponse,
 	Member,
 	MemberResponse,
 	MembersListParams,
@@ -47,5 +52,25 @@ export class Workspace extends APIResource {
 			body: params,
 		})) as unknown as MemberResponse;
 		return response.member;
+	}
+
+	/**
+	 * List all groups in the workspace
+	 */
+	async listGroups(): Promise<Group[]> {
+		const response = (await this._client.get(
+			"/workspace/groups",
+		)) as unknown as GroupsListResponse;
+		return response.userGroups;
+	}
+
+	/**
+	 * Create a new group in the workspace
+	 */
+	async createGroup(params: GroupCreateParams): Promise<CreatedGroup> {
+		const response = (await this._client.post("/workspace/groups", {
+			body: params,
+		})) as unknown as GroupCreateResponse;
+		return response.group;
 	}
 }

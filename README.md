@@ -148,6 +148,17 @@ console.log(member.name, member.role, member.groups);
 const updatedMember = await caret.workspace.updateMember('member_id', {
   groupIds: ['group_1', 'group_2']
 });
+
+// List all groups in the workspace
+const groups = await caret.workspace.listGroups();
+console.log(groups.map(g => ({ name: g.name, members: g.memberCount })));
+
+// Create a new group
+const newGroup = await caret.workspace.createGroup({
+  name: 'Engineering Team',
+  description: 'All engineering team members'
+});
+console.log(newGroup.id, newGroup.name);
 ```
 
 ## Rate Limits
@@ -202,7 +213,8 @@ import type {
   NoteVisibility, 
   Tag,
   WorkspaceType,
-  Member 
+  Member,
+  Group 
 } from '@theventures/caret';
 
 const note: Note | null = await caret.notes.get('note_id');
@@ -220,6 +232,11 @@ console.log(workspace.settings.defaultLanguage); // Fully typed
 
 const member: Member = await caret.workspace.getMember('member_id');
 console.log(member.role, member.groups); // Fully typed
+
+const groups: Group[] = await caret.workspace.listGroups();
+groups.forEach(group => {
+  console.log(group.name, group.memberCount, group.description); // Fully typed
+});
 ```
 
 ## Requirements

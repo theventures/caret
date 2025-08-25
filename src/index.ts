@@ -35,7 +35,12 @@ export type {
 	TagsListResponse,
 } from "./types/tags.js";
 export type {
+	CreatedGroup,
 	Group,
+	GroupCreateParams,
+	GroupCreateResponse,
+	GroupReference,
+	GroupsListResponse,
 	Member,
 	MemberResponse,
 	MembersListParams,

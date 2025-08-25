@@ -4,6 +4,10 @@ import { BadRequestError, NotFoundError } from "../../src/core/errors.js";
 import { Workspace } from "../../src/resources/workspace.js";
 import type { ResponseBody } from "../../src/types/common.js";
 import type {
+	CreatedGroup,
+	Group,
+	GroupCreateParams,
+	GroupReference,
 	Member,
 	MembersListParams,
 	MembersListResponse,
@@ -41,7 +45,7 @@ const sampleMember: Member = {
 	groups: [
 		{ id: "group-1", name: "Engineering" },
 		{ id: "group-2", name: "Leadership" },
-	],
+	] as GroupReference[],
 };
 
 const sampleMembersListResponse: MembersListResponse = {
@@ -63,6 +67,33 @@ const sampleMembersListResponse: MembersListResponse = {
 		nextOffset: 20,
 		isLast: false,
 	},
+};
+
+const sampleGroup: Group = {
+	id: "01887270-group-id",
+	name: "Engineering",
+	createdAt: "2023-01-20T10:00:00Z",
+	memberCount: 15,
+	description: "Engineering team members",
+};
+
+const sampleGroupsListResponse = {
+	userGroups: [
+		sampleGroup,
+		{
+			id: "01887270-group-2",
+			name: "Marketing",
+			createdAt: "2023-02-15T14:30:00Z",
+			memberCount: 8,
+		},
+		{
+			id: "01887270-group-3",
+			name: "Sales",
+			createdAt: "2023-03-10T09:15:00Z",
+			memberCount: 12,
+			description: "Sales team",
+		},
+	],
 };
 
 describe("Workspace Resource", () => {
@@ -474,6 +505,223 @@ describe("Workspace Resource", () => {
 			await expect(
 				noRetryWorkspace.updateMember(memberId, updateParams),
 			).rejects.toThrow("Rate limit exceeded");
+		});
+	});
+
+	describe("listGroups()", () => {
+		test("should list all groups in the workspace", async () => {
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockResponse({
+						data: sampleGroupsListResponse as unknown as ResponseBody,
+					}),
+				),
+			);
+
+			const result = await workspace.listGroups();
+
+			expect(result).toEqual(sampleGroupsListResponse.userGroups);
+			expect(result).toHaveLength(3);
+			expect(result[0]?.name).toBe("Engineering");
+		});
+
+		test("should call correct endpoint", async () => {
+			let calledUrl = "";
+			let calledMethod = "";
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string, options: RequestInit) => {
+					calledUrl = url;
+					calledMethod = options.method || "";
+					return createMockResponse({
+						data: sampleGroupsListResponse as unknown as ResponseBody,
+					});
+				}),
+			);
+
+			await workspace.listGroups();
+
+			expect(calledUrl).toBe("https://api.caret.so/v1/workspace/groups");
+			expect(calledMethod).toBe("GET");
+		});
+
+		test("should handle empty groups list", async () => {
+			const emptyResponse = { userGroups: [] };
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockResponse({
+						data: emptyResponse as unknown as ResponseBody,
+					}),
+				),
+			);
+
+			const result = await workspace.listGroups();
+
+			expect(result).toEqual([]);
+		});
+
+		test("should handle groups with and without descriptions", async () => {
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockResponse({
+						data: sampleGroupsListResponse as unknown as ResponseBody,
+					}),
+				),
+			);
+
+			const result = await workspace.listGroups();
+
+			expect(result[0]?.description).toBe("Engineering team members");
+			expect(result[1]?.description).toBeUndefined();
+			expect(result[2]?.description).toBe("Sales team");
+		});
+
+		test("should handle authentication error", async () => {
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockErrorResponse(401, { message: "Invalid API key" }),
+				),
+			);
+
+			await expect(workspace.listGroups()).rejects.toThrow("Invalid API key");
+		});
+	});
+
+	describe("createGroup()", () => {
+		const createParams: GroupCreateParams = {
+			name: "New Team",
+			description: "A newly created team",
+		};
+
+		test("should create a new group", async () => {
+			const newGroup: CreatedGroup = {
+				id: "01887270-new-group",
+				name: "New Team",
+				createdAt: "2024-01-15T10:00:00Z",
+				description: "A newly created team",
+			};
+
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockResponse({ data: { group: newGroup } })),
+			);
+
+			const result = await workspace.createGroup(createParams);
+
+			expect(result).toEqual(newGroup);
+			expect(result.name).toBe("New Team");
+		});
+
+		test("should create group without description", async () => {
+			const paramsNoDesc: GroupCreateParams = {
+				name: "Simple Team",
+			};
+			const newGroup: CreatedGroup = {
+				id: "01887270-simple-group",
+				name: "Simple Team",
+				createdAt: "2024-01-15T10:00:00Z",
+			};
+
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockResponse({ data: { group: newGroup } })),
+			);
+
+			const result = await workspace.createGroup(paramsNoDesc);
+
+			expect(result).toEqual(newGroup);
+			expect(result.description).toBeUndefined();
+		});
+
+		test("should call correct endpoint with POST method", async () => {
+			let calledUrl = "";
+			let calledMethod = "";
+			let requestBody = "";
+			const createdGroup: CreatedGroup = {
+				id: sampleGroup.id,
+				name: sampleGroup.name,
+				createdAt: sampleGroup.createdAt,
+				description: sampleGroup.description,
+			};
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string, options: RequestInit) => {
+					calledUrl = url;
+					calledMethod = options.method || "";
+					requestBody = options.body as string;
+					return createMockResponse({
+						data: { group: createdGroup },
+					});
+				}),
+			);
+
+			await workspace.createGroup(createParams);
+
+			expect(calledUrl).toBe("https://api.caret.so/v1/workspace/groups");
+			expect(calledMethod).toBe("POST");
+			expect(JSON.parse(requestBody)).toEqual(createParams);
+		});
+
+		test("should include correct headers", async () => {
+			let headers: Record<string, string> = {};
+			const createdGroup: CreatedGroup = {
+				id: sampleGroup.id,
+				name: sampleGroup.name,
+				createdAt: sampleGroup.createdAt,
+				description: sampleGroup.description,
+			};
+			globalThis.fetch = castMockToFetch(
+				mock(async (_url: string, options: RequestInit) => {
+					headers = options.headers as Record<string, string>;
+					return createMockResponse({ data: { group: createdGroup } });
+				}),
+			);
+
+			await workspace.createGroup(createParams);
+
+			expect(headers.Authorization).toBe("Bearer sk-test-key");
+			expect(headers["Content-Type"]).toBe("application/json");
+		});
+
+		test("should handle validation errors", async () => {
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockErrorResponse(400, {
+						message: "Invalid group name",
+						errors: {
+							name: "Name must be between 1 and 100 characters",
+						},
+					}),
+				),
+			);
+
+			await expect(workspace.createGroup({ name: "" })).rejects.toThrow(
+				BadRequestError,
+			);
+		});
+
+		test("should handle duplicate group name error", async () => {
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockErrorResponse(409, {
+						message: "A group with this name already exists",
+					}),
+				),
+			);
+
+			await expect(
+				workspace.createGroup({ name: "Engineering" }),
+			).rejects.toThrow("A group with this name already exists");
+		});
+
+		test("should handle permission denied error", async () => {
+			globalThis.fetch = castMockToFetch(
+				mock(async () =>
+					createMockErrorResponse(403, {
+						message: "Only admins can create groups",
+					}),
+				),
+			);
+
+			await expect(workspace.createGroup(createParams)).rejects.toThrow(
+				"Only admins can create groups",
+			);
 		});
 	});
 
