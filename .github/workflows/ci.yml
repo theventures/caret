@@ -56,5 +56,5 @@ jobs:
       
       - name: Verify package exports
         run: |
-          node -e "const pkg = require('./dist/index.js'); console.log('CJS:', typeof pkg.Caret)"
+          node -e "const pkg = require('./dist/index.cjs'); console.log('CJS:', typeof pkg.Caret)"
           node -e "import('./dist/index.mjs').then(m => console.log('ESM:', typeof m.Caret))"

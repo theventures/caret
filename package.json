@@ -2,7 +2,7 @@
 	"name": "@theventures/caret",
 	"version": "0.0.4",
 	"description": "Unofficial Node.js API client for the Caret HTTP API",
-	"main": "dist/index.js",
+	"main": "dist/index.cjs",
 	"module": "dist/index.mjs",
 	"types": "dist/index.d.ts",
 	"type": "module",
@@ -10,7 +10,7 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.mjs",
-			"require": "./dist/index.js"
+			"require": "./dist/index.cjs"
 		}
 	},
 	"files": [
@@ -19,7 +19,7 @@
 		"LICENSE"
 	],
 	"scripts": {
-		"build": "bun run clean && bun build src/index.ts --outfile dist/index.mjs --target node --format esm && bun build src/index.ts --outfile dist/index.js --target node --format cjs && bun tsc --project tsconfig.build.json",
+		"build": "bun run clean && bun build src/index.ts --outfile dist/index.mjs --target node --format esm && bun build src/index.ts --outfile dist/index.cjs --target node --format cjs && bun tsc --project tsconfig.build.json",
 		"clean": "rm -rf dist",
 		"test": "bun test",
 		"typecheck": "bun tsc --noEmit",
