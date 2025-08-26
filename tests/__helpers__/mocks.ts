@@ -97,6 +97,30 @@ export function mockFetchWithDelay(
 	) as MockFetch;
 }
 
+export const sampleCalendarEvent = {
+	id: "cal_event_123",
+	href: "https://www.google.com/calendar/event?eid=test123",
+	title: "Test Meeting",
+	endsAt: "2024-01-01T11:00:00Z",
+	startsAt: "2024-01-01T10:00:00Z",
+	attendees: [
+		{
+			self: true,
+			email: "john@example.com",
+			displayName: "John Doe",
+		},
+		{
+			self: false,
+			email: "jane@example.com",
+			displayName: "Jane Smith",
+		},
+	],
+	createdAt: "2024-01-01T09:00:00Z",
+	updatedAt: "2024-01-01T09:30:00Z",
+	calendarId:
+		"c_096f13ae8a6ee399087a627c9210a79a04db790c58a2d205d4d05cb37f81748b@group.calendar.google.com",
+};
+
 export const sampleNote = {
 	id: "note_123",
 	title: "Test Meeting Notes",

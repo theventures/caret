@@ -9,6 +9,7 @@ import {
 	castMockToFetch,
 	createMockErrorResponse,
 	createMockResponse,
+	sampleCalendarEvent,
 	sampleNote,
 	sampleNotesListResponse,
 } from "../__helpers__/mocks.js";
@@ -153,6 +154,43 @@ describe("Notes Resource", () => {
 
 			expect(result).toEqual(sampleNote);
 			expect(calledUrl).toBe("https://api.caret.so/v1/notes/note_123");
+		});
+
+		test("should get note with calendarEvent", async () => {
+			const noteWithCalendar = {
+				...sampleNote,
+				calendarEvent: sampleCalendarEvent,
+			};
+			const responseData = { note: noteWithCalendar };
+			let calledUrl = "";
+			globalThis.fetch = castMockToFetch(
+				mock(async (url: string) => {
+					calledUrl = url;
+					return createMockResponse({ data: responseData });
+				}),
+			);
+
+			const result = await notes.get("note_with_calendar");
+
+			expect(result).toEqual(noteWithCalendar);
+			expect(result?.calendarEvent).toEqual(sampleCalendarEvent);
+			expect(result?.calendarEvent?.attendees).toHaveLength(2);
+			expect(calledUrl).toBe(
+				"https://api.caret.so/v1/notes/note_with_calendar",
+			);
+		});
+
+		test("should get note without calendarEvent", async () => {
+			const noteWithoutCalendar = { ...sampleNote, calendarEvent: undefined };
+			const responseData = { note: noteWithoutCalendar };
+			globalThis.fetch = castMockToFetch(
+				mock(async () => createMockResponse({ data: responseData })),
+			);
+
+			const result = await notes.get("note_without_calendar");
+
+			expect(result).toEqual(noteWithoutCalendar);
+			expect(result?.calendarEvent).toBeUndefined();
 		});
 
 		test("should handle special characters in note ID", async () => {

@@ -20,6 +20,24 @@ export interface NoteTranscript {
 	endTimestamp: string;
 }
 
+export interface CalendarEventAttendee {
+	self: boolean;
+	email: string;
+	displayName: string;
+}
+
+export interface CalendarEvent {
+	id: string;
+	href: string;
+	title: string;
+	endsAt: string;
+	startsAt: string;
+	attendees: CalendarEventAttendee[];
+	createdAt: string;
+	updatedAt: string;
+	calendarId: string;
+}
+
 export type NoteKind = "online" | "in-person" | "podcast";
 
 export type NoteStatus =
@@ -47,6 +65,7 @@ export interface Note {
 	enhancedNote: string;
 	summary: string;
 	transcripts: NoteTranscript[];
+	calendarEvent?: CalendarEvent;
 }
 
 export interface NotesListParams {
