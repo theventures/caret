@@ -14,7 +14,8 @@
 			"Bash(git add:*)",
 			"Bash(git checkout:*)",
 			"Bash(node:*)",
-			"Bash(cat:*)"
+			"Bash(cat:*)",
+			"Bash(gh api:*)"
 		],
 		"deny": []
 	}
