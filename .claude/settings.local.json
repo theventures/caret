@@ -7,13 +7,14 @@
 			"Bash(bun tsc:*)",
 			"Bash(bun test:*)",
 			"Bash(find:*)",
-			"Bash(git commit:*)",
 			"Bash(bun:*)",
 			"Bash(sed:*)",
-			"Bash(git add:*)",
 			"Bash(rg:*)",
 			"Bash(ls:*)",
-			"Bash(git checkout:*)"
+			"Bash(git add:*)",
+			"Bash(git checkout:*)",
+			"Bash(node:*)",
+			"Bash(cat:*)"
 		],
 		"deny": []
 	}

@@ -3,6 +3,8 @@
 > Unofficial Node.js API client for the Caret HTTP API
 
 [![npm version](https://badge.fury.io/js/@theventures%2Fcaret.svg)](https://www.npmjs.com/package/@theventures/caret)
+[![CI](https://github.com/theventures/caret/actions/workflows/ci.yml/badge.svg)](https://github.com/theventures/caret/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/theventures/caret/graph/badge.svg?token=D2KRY3K34B)](https://codecov.io/gh/theventures/caret)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [Caret](https://caret.so) is a meeting transcription and note management service. This library provides a convenient way to interact with the Caret API from Node.js applications.
