@@ -2,12 +2,13 @@
 
 > Unofficial Node.js API client for the Caret HTTP API
 
-[![npm version](https://badge.fury.io/js/@theventures%2Fcaret.svg)](https://www.npmjs.com/package/@theventures/caret)
+[![NPM version](https://img.shields.io/npm/v/@theventures%2Fcaret?logo=npm)]([https://www.npmjs.com/package/es-toolkit](https://www.npmjs.com/package/@theventures/caret))
 [![CI](https://github.com/theventures/caret/actions/workflows/ci.yml/badge.svg)](https://github.com/theventures/caret/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/theventures/caret/graph/badge.svg?token=D2KRY3K34B)](https://codecov.io/gh/theventures/caret)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/theventures/caret/blob/main/LICENSE)
 
-[Caret](https://caret.so) is a meeting transcription and note management service. This library provides a convenient way to interact with the Caret API from Node.js applications.
+
+[Caret](https://caret.so) is an AI meeting notetaker that transcribes and translates in real-time. This library provides a convenient way to interact with the [Caret API](https://docs.caret.so/api-reference/overview) from Node.js applications.
 
 ## Installation
 
