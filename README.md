@@ -8,7 +8,9 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/theventures/caret/blob/main/LICENSE)
 
 
-[Caret](https://caret.so) is an AI meeting notetaker that transcribes and translates in real-time. This library provides a convenient way to interact with the [Caret API](https://docs.caret.so/api-reference/overview) from Node.js applications.
+[Caret](https://caret.so) is an AI meeting notetaker that transcribes and translates in real-time. This library provides a convenient way to interact with the [Caret API](https://docs.caret.so/api-reference/introduction) from Node.js applications.
+
+> **Note:** The Caret API is undergoing significant changes. Authentication is migrating from Bearer tokens to `X-API-Key` headers, Tags/Groups are being replaced by Folders, and new resources (Folders, Audio Upload) are being added. See the [latest API documentation](https://docs.caret.so/api-reference/introduction) for details. This library will be updated to support the new API in an upcoming release.
 
 ## Installation
 
@@ -333,13 +335,13 @@ For issues with this library:
 ## Links
 
 - [Caret Official Website](https://caret.so)
-- [Caret API Documentation](https://docs.caret.so/api-reference/overview)
+- [Caret API Documentation](https://docs.caret.so/api-reference/introduction)
 - [npm Package](https://www.npmjs.com/package/@theventures/caret)
 - [GitHub Repository](https://github.com/theventures/caret)
 
 ## About
 
-This package is published by [TheVentures](https://theventures.vc), the investment company behind [At Inc.](https://www.at.studio) (the company that operates Caret).
+This package is published by [TheVentures](https://theventures.vc), the investment company behind [At Your Side Inc.](https://www.at.studio) (the company that operates Caret).
 
 ### Built with AI
 

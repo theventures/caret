@@ -15,7 +15,10 @@
 			"Bash(git checkout:*)",
 			"Bash(node:*)",
 			"Bash(cat:*)",
-			"Bash(gh api:*)"
+			"Bash(gh api:*)",
+			"WebFetch(domain:caret.so)",
+			"Bash(grep:*)",
+			"Bash(python3:*)"
 		],
 		"deny": []
 	}
