@@ -8,7 +8,9 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/theventures/caret/blob/main/LICENSE)
 
 
-[Caret](https://caret.so) is an AI meeting notetaker that transcribes and translates in real-time. This library provides a convenient way to interact with the [Caret API](https://docs.caret.so/api-reference/overview) from Node.js applications.
+[Caret](https://caret.so) is an AI meeting notetaker that transcribes and translates in real-time. This library provides a convenient way to interact with the [Caret API](https://docs.caret.so/api-reference/introduction) from Node.js applications.
+
+> **Note:** The Caret API is undergoing significant changes. Authentication is migrating from Bearer tokens to `X-API-Key` headers, Tags/Groups are being replaced by Folders, and new resources (Folders, Audio Upload) are being added. See the [latest API documentation](https://docs.caret.so/api-reference/introduction) for details. This library will be updated to support the new API in an upcoming release.
 
 ## Installation
 
@@ -234,22 +236,23 @@ import { WebhookVerifier } from '@theventures/caret';
 // Next.js App Router example
 export async function POST(request: Request) {
   // Uses CARET_WEBHOOK_SECRET env var automatically or you can pass it in the constructor
-  const verifier = new WebhookVerifier(); 
-  
+  const verifier = new WebhookVerifier();
+
   // Verify and parse in one step with full type safety
-  const { isValid, data, error } = await verifier.verifyRequest<'note.created'>(request);
-  
+  const { isValid, data, error } = await verifier.verifyRequest<'meeting.created'>(request);
+
   if (!isValid) {
     console.error('Webhook verification failed:', error);
     return new Response('Unauthorized', { status: 401 });
   }
-  
-  // data is fully typed as WebhookEventMap['note.created']
-  const note = data.payload.note; // Fully typed as Note
-  console.log('New note created:', note.title);
-  console.log('Participants:', note.participants);
-  // Process the note...
-  
+
+  // data is fully typed as WebhookEventMap['meeting.created']
+  const meeting = data.payload.meeting; // Fully typed as Meeting
+  console.log('New meeting created:', meeting.title);
+  console.log('Summary:', meeting.summary.content);
+  console.log('Transcripts:', meeting.transcripts.length);
+  // Process the meeting...
+
   return new Response('OK', { status: 200 });
 }
 ```
@@ -259,15 +262,16 @@ export async function POST(request: Request) {
 This library is written in TypeScript and provides comprehensive type definitions:
 
 ```typescript
-import type { 
-  Note, 
-  NoteStatus, 
-  NoteVisibility, 
+import type {
+  Note,
+  NoteStatus,
+  NoteVisibility,
   Tag,
   WorkspaceType,
   Member,
   Group,
   Invite,
+  Meeting,
   WebhookEvent,
   WebhookEventMap
 } from '@theventures/caret';
@@ -300,14 +304,14 @@ const invite: Invite = await caret.workspace.createInvite({
 console.log(invite.code, invite.expiresAt, invite.groups); // Fully typed
 
 // Webhook event types
-const webhookEvent: WebhookEventMap['note.created'] = {
-  type: 'note.created',
+const webhookEvent: WebhookEventMap['meeting.created'] = {
+  type: 'meeting.created',
   eventId: 'evt_123',
   webhookId: 'wh_456',
   workspaceId: 'ws_789',
   timestamp: '2024-01-01T00:00:00Z',
   payload: {
-    note: note! // Fully typed as Note
+    meeting: { /* Fully typed as Meeting */ } as Meeting
   }
 };
 ```
@@ -333,13 +337,13 @@ For issues with this library:
 ## Links
 
 - [Caret Official Website](https://caret.so)
-- [Caret API Documentation](https://docs.caret.so/api-reference/overview)
+- [Caret API Documentation](https://docs.caret.so/api-reference/introduction)
 - [npm Package](https://www.npmjs.com/package/@theventures/caret)
 - [GitHub Repository](https://github.com/theventures/caret)
 
 ## About
 
-This package is published by [TheVentures](https://theventures.vc), the investment company behind [At Inc.](https://www.at.studio) (the company that operates Caret).
+This package is published by [TheVentures](https://theventures.vc), the investment company behind [At Your Side Inc.](https://www.at.studio) (the company that operates Caret).
 
 ### Built with AI
 

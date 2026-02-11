@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Purpose
 
-This is an unofficial Node.js API client for the Caret HTTP API (https://docs.caret.so/api-reference/overview). Caret is a meeting transcription and note management service.
+This is an unofficial Node.js API client for the Caret HTTP API (https://docs.caret.so/api-reference/introduction). Caret is an AI-powered meeting assistant that provides real-time guidance, coaching, and knowledge base capabilities during calls, along with automated transcription and meeting summaries.
 
 ## Development Commands
 
@@ -21,13 +21,17 @@ This is an unofficial Node.js API client for the Caret HTTP API (https://docs.ca
 The client should implement:
 
 - **Base URL**: `https://api.caret.so/v1`
-- **Authentication**: Bearer token authentication (`Authorization: Bearer sk-caret-api-xxxxxxxxxxxxxxxxxxxx`)
-- **Rate limiting**: Handle different rate limits (Free: 60/min, Pro: 120/min, Enterprise: 300/min)
+- **Authentication**: API key authentication (`X-API-Key` header)
+- **API Scopes**: Permission-based access control (`users`, `notes`, `folders`, `templates`)
+- **Rate limiting**: Standard endpoints (100 requests/min), Heavy operations (20 requests/min)
 - **Core resources**:
-  - Notes (create, read, update, delete meeting notes and transcripts)
-  - Webhooks (manage real-time event notifications)
-  - Workspace (manage members, invites, groups)
-  - Tags (retrieve workspace tags)
+  - Notes (list, get, update meeting notes; create from audio — Enterprise only)
+  - Folders (create, list workspace folders — replaces deprecated Tags)
+  - Workspace (get workspace details and settings)
+  - Members (list workspace members with pagination)
+  - Invites (list, create, delete workspace invites)
+  - Zapier Webhooks (register/delete webhook URLs for Zapier integration)
+- **MCP Server**: Caret also provides an MCP server at `https://api.caret.so/mcp` for AI assistant integration
 
 ## Design Patterns (Inspired by OpenAI Node.js Client)
 
@@ -36,9 +40,11 @@ The client should implement:
 // Main client class
 class Caret {
   notes = new Notes(this);
+  folders = new Folders(this);
   workspace = new Workspace(this);
-  tags = new Tags(this);
-  webhooks = new Webhooks(this);
+  members = new Members(this);
+  invites = new Invites(this);
+  zapier = new Zapier(this);
 }
 
 // Base resource pattern
@@ -73,24 +79,26 @@ const caret = new Caret({
 
 TypeScript interfaces for core models:
 
-- **Note**: id, title, kind, status, createdAt, updatedAt, visibility, tags, participants, totalDurationSec, userWrittenNote, enhancedNote, summary, transcripts
-- **Workspace**: id, name, createdAt, updatedAt, settings (defaultLanguage, brandColor, enableTranscriptSharing), allowedEmailDomains, iconUrl
-- **Member**: id, userId, name, email, profileUrl, role, createdAt, groups
-- **Invite**: id, email, code, role, expiresAt, createdAt, isUrlInvite, groups
-- **Tag**: id, name, color, createdAt
-- **Group**: id, name, createdAt, memberCount, description (optional)
+- **Note**: id, title, kind, status, createdAt, updatedAt, visibility (only-me/workspace/public), tags, participants, totalDurationSec, userWrittenNote, enhancedNote, summary, transcripts, calendarEvent, inputLanguage, translationLanguage, meetingApp
+- **Folder**: id, name, icon, parentFolderId, createdAt, memberCount
+- **Workspace**: id, name, createdAt, updatedAt, settings (company info, key terms, audio storage, data retention, meeting permissions, sensitive info masking), allowedEmailDomains, iconUrl
+- **Member**: id, name, email, profileUrl, role (admin/member), createdAt, folders
+- **Invite**: id, email, code, role, expiresAt, createdAt, isUrlInvite, folders
 
 ## Project Structure
 
 ```
 src/
-├── core/           # Core SDK functionality (errors, pagination, etc.)
+├── core/           # Core SDK functionality (errors, etc.)
 ├── resources/      # API endpoint implementations
 │   ├── notes.ts
+│   ├── folders.ts    # Workspace folders (replaces tags.ts)
 │   ├── workspace.ts
-│   ├── tags.ts
-│   └── webhooks.ts
+│   ├── members.ts    # Workspace members
+│   ├── invites.ts    # Workspace invites
+│   └── zapier.ts     # Zapier webhook integration
 ├── types/          # TypeScript type definitions
+├── webhooks/       # Webhook signature verification
 ├── client.ts       # Main Caret client class
 └── index.ts        # Primary export point
 
@@ -98,6 +106,7 @@ tests/
 ├── __helpers__/    # Shared test utilities and mocks
 ├── core/           # Tests for core functionality
 ├── resources/      # Tests for API resources
+├── webhooks/       # Tests for webhook verification
 ├── client.test.ts  # Core client tests
 └── errors.test.ts  # Error handling tests
 ```
@@ -166,7 +175,7 @@ bun test                   # Run all tests
 
 ## Publishing to npm
 
-This package is published as `@theventures/caret` on npm by TheVentures, the investment company behind At Inc. (the company that operates Caret).
+This package is published as `@theventures/caret` on npm by TheVentures, the investment company behind At Your Side Inc. (the company that operates Caret).
 
 ### Publishing Information
 - **Package name**: `@theventures/caret`

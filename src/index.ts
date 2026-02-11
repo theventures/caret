@@ -16,6 +16,17 @@ export { Notes } from "./resources/notes.js";
 export { Tags } from "./resources/tags.js";
 export { Workspace } from "./resources/workspace.js";
 export type {
+	Meeting,
+	MeetingAclRule,
+	MeetingCalendarEvent,
+	MeetingCalendarEventAttendee,
+	MeetingCreator,
+	MeetingSpeakerAnalysis,
+	MeetingSummary,
+	MeetingTranscript,
+	MeetingTranscriptWord,
+} from "./types/meeting.js";
+export type {
 	Note,
 	NoteKind,
 	NoteParticipant,
@@ -35,8 +46,8 @@ export type {
 	TagsListResponse,
 } from "./types/tags.js";
 export type {
-	NoteAudioUploadedPayload,
-	NoteCreatedPayload,
+	MeetingAudioUploadedPayload,
+	MeetingCreatedPayload,
 	TestPayload,
 	WebhookEvent,
 	WebhookEventMap,
