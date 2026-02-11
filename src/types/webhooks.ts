@@ -1,4 +1,4 @@
-import type { Note } from "./note.js";
+import type { Meeting } from "./meeting.js";
 
 export interface WebhookEvent<T = unknown> {
 	type: string;
@@ -9,13 +9,12 @@ export interface WebhookEvent<T = unknown> {
 	payload: T;
 }
 
-export interface NoteCreatedPayload {
-	note: Note;
+export interface MeetingCreatedPayload {
+	meeting: Meeting;
 }
 
-export interface NoteAudioUploadedPayload {
-	noteId: string;
-	audioUrl: string;
+export interface MeetingAudioUploadedPayload {
+	audio_url: string;
 }
 
 export interface TestPayload {
@@ -23,8 +22,8 @@ export interface TestPayload {
 }
 
 export type WebhookEventMap = {
-	"note.created": WebhookEvent<NoteCreatedPayload>;
-	"note.audio_uploaded": WebhookEvent<NoteAudioUploadedPayload>;
+	"meeting.created": WebhookEvent<MeetingCreatedPayload>;
+	"meeting.audio_uploaded": WebhookEvent<MeetingAudioUploadedPayload>;
 	test: WebhookEvent<TestPayload>;
 };
 

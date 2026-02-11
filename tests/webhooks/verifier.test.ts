@@ -222,31 +222,101 @@ describe("WebhookVerifier", () => {
 			expect(result.error).toBe("Read error");
 		});
 
-		it("should work with note.created event type", async () => {
-			const noteData = {
-				id: "note_123",
-				title: "Test Note",
-				kind: "online",
+		it("should work with meeting.created event type", async () => {
+			const meetingData = {
+				id: "645beefe-6b00-45a2-af8e-fb2d190fce4z",
+				workspace_id: "ws_789",
 				status: "completed",
-				createdAt: "2024-01-01T00:00:00Z",
-				updatedAt: "2024-01-01T00:00:00Z",
-				visibility: "private",
-				tags: [],
-				participants: [],
-				totalDurationSec: 300,
-				userWrittenNote: "Test note content",
-				enhancedNote: "",
-				summary: "Test summary",
-				transcripts: [],
+				permission: "workspace",
+				title: "Test Meeting",
+				private_note: "",
+				total_duration_sec: 29,
+				meeting_autostarted_app: null,
+				audio_location: "aside-server",
+				audio_url: "https://example.com/audio.m4a",
+				created_by: "user_123",
+				created_at: "2024-01-01T00:00:00Z",
+				updated_at: "2024-01-01T00:00:00Z",
+				archived_at: null,
+				suggestions: {},
+				calendar_event_id: "cal_123",
+				transcripts: [
+					{
+						id: "G0",
+						end: 8,
+						text: "Hello, this is a test.",
+						start: 1,
+						words: [{ end: 8, text: "Hello, this is a test.", start: 1 }],
+						speaker: "Speaker A",
+						chunkId: "chunk_1",
+						segmentId: "seg_1",
+					},
+				],
+				language: "en-US",
+				is_auto_ended: false,
+				auto_end_reason: null,
+				live_scenario_id: "scenario_1",
+				questions: {},
+				speaker_analysis: [
+					{
+						id: "Speaker A",
+						name: "John",
+						role: "Host",
+						nameReason: "",
+						voiceSampleUrl: "",
+						voiceCharacteristics: "Male, clear tone",
+					},
+				],
+				linked_crm: null,
+				reference_call_supermemory_id: null,
+				llm_sharing_agreed_at: null,
+				summary: {
+					content: "Test summary",
+					language: "English",
+					created_at: "2024-01-01T00:00:00Z",
+					template_id: null,
+				},
+				calendarEvent: {
+					id: "cal_123",
+					href: "https://calendar.example.com/event",
+					title: "Test Meeting",
+					endsAt: "2024-01-01T01:00:00Z",
+					startsAt: "2024-01-01T00:00:00Z",
+					timezone: "UTC",
+					createdAt: "2024-01-01T00:00:00Z",
+					updatedAt: "2024-01-01T00:00:00Z",
+					calendarId: "primary",
+					uuid: "uuid_123",
+					attendees: [],
+				},
+				timelineSummary: "",
+				creator: {
+					id: "user_123",
+					name: "John Doe",
+					email: "john@example.com",
+					locale: "en-US",
+					job_title: "Engineer",
+					profile_url: "",
+				},
+				acl_rules: [
+					{
+						id: "acl_1",
+						user: null,
+						folder: null,
+						can_read: true,
+						can_write: true,
+						principal_type: "workspace",
+					},
+				],
 			};
 
 			const eventData = {
-				type: "note.created",
+				type: "meeting.created",
 				eventId: "evt_123",
 				webhookId: "wh_456",
 				workspaceId: "ws_789",
 				timestamp: "2024-01-01T00:00:00Z",
-				payload: { note: noteData },
+				payload: { meeting: meetingData },
 			};
 
 			const payload = JSON.stringify(eventData);
@@ -262,10 +332,49 @@ describe("WebhookVerifier", () => {
 				body: payload,
 			});
 
-			const result = await verifier.verifyRequest<"note.created">(request);
+			const result = await verifier.verifyRequest<"meeting.created">(request);
 			expect(result.isValid).toBe(true);
-			expect(result.data?.payload.note.id).toBe("note_123");
-			expect(result.data?.payload.note.title).toBe("Test Note");
+			expect(result.data?.payload.meeting.id).toBe(
+				"645beefe-6b00-45a2-af8e-fb2d190fce4z",
+			);
+			expect(result.data?.payload.meeting.title).toBe("Test Meeting");
+			expect(result.data?.payload.meeting.transcripts[0].text).toBe(
+				"Hello, this is a test.",
+			);
+			expect(result.data?.payload.meeting.summary.content).toBe("Test summary");
+		});
+
+		it("should work with meeting.audio_uploaded event type", async () => {
+			const eventData = {
+				type: "meeting.audio_uploaded",
+				eventId: "evt_456",
+				webhookId: "wh_456",
+				workspaceId: "ws_789",
+				timestamp: "2024-01-01T00:00:00Z",
+				payload: {
+					audio_url: "https://example.com/meetings/full-1.m4a",
+				},
+			};
+
+			const payload = JSON.stringify(eventData);
+			const hmac = createHmac("sha256", secret);
+			const signature = hmac.update(payload).digest("hex");
+
+			const request = new Request("https://example.com/webhook", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"X-Caret-Signature": signature,
+				},
+				body: payload,
+			});
+
+			const result =
+				await verifier.verifyRequest<"meeting.audio_uploaded">(request);
+			expect(result.isValid).toBe(true);
+			expect(result.data?.payload.audio_url).toBe(
+				"https://example.com/meetings/full-1.m4a",
+			);
 		});
 	});
 
