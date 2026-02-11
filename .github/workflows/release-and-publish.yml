@@ -4,14 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version (e.g., patch, minor, major, or specific version)'
+        description: 'Release version (e.g., patch, minor, major, or specific like 3.0.0-alpha.1)'
         required: true
         default: 'patch'
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
+        type: string
       publish_to_npm:
         description: 'Publish to npm after release'
         required: true
@@ -67,6 +63,17 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
       
+      - name: Detect prerelease
+        id: prerelease
+        run: |
+          if [[ "${{ steps.version.outputs.version }}" == *-* ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            echo "npm_tag=$(echo '${{ steps.version.outputs.version }}' | sed 's/.*-\([a-zA-Z]*\).*/\1/')" >> $GITHUB_OUTPUT
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            echo "npm_tag=latest" >> $GITHUB_OUTPUT
+          fi
+
       - name: Generate changelog
         id: changelog
         run: |
@@ -93,10 +100,10 @@ jobs:
           release_name: v${{ steps.version.outputs.version }}
           body_path: RELEASE_NOTES.md
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.prerelease.outputs.is_prerelease == 'true' }}
       
       - name: Publish to npm
         if: ${{ github.event.inputs.publish_to_npm == 'true' }}
-        run: npm publish --access public --provenance
+        run: npm publish --access public --provenance --tag ${{ steps.prerelease.outputs.npm_tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
