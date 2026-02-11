@@ -16,8 +16,7 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
-  id-token: write  # For npm provenance
+  id-token: write  # Required for OIDC trusted publishing
 
 jobs:
   release-and-publish:
@@ -39,7 +38,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 24.x
           registry-url: 'https://registry.npmjs.org'
       
       - name: Configure Git
@@ -59,9 +58,23 @@ jobs:
       - name: Bump version
         id: version
         run: |
-          npm version ${{ github.event.inputs.version }} --no-git-tag-version
+          CURRENT=$(node -p "require('./package.json').version")
+          INPUT="${{ github.event.inputs.version }}"
+
+          if [[ "$INPUT" =~ ^(patch|minor|major|premajor|preminor|prepatch|prerelease)$ ]]; then
+            npm version "$INPUT" --no-git-tag-version
+          elif [[ "$CURRENT" != "$INPUT" ]]; then
+            npm version "$INPUT" --no-git-tag-version
+          fi
+
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          if [[ "$CURRENT" == "$VERSION" ]]; then
+            echo "bumped=false" >> $GITHUB_OUTPUT
+          else
+            echo "bumped=true" >> $GITHUB_OUTPUT
+          fi
       
       - name: Detect prerelease
         id: prerelease
@@ -84,14 +97,17 @@ jobs:
           echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/$(git describe --tags --abbrev=0 2>/dev/null || echo "")...v${{ steps.version.outputs.version }}" >> RELEASE_NOTES.md
       
       - name: Commit version bump
+        if: steps.version.outputs.bumped == 'true'
         run: |
           git add package.json
           git commit -m "Release v${{ steps.version.outputs.version }}"
-      
+
       - name: Push changes
+        if: steps.version.outputs.bumped == 'true'
         run: git push origin main
-      
+
       - name: Create GitHub Release
+        if: steps.version.outputs.bumped == 'true'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -104,6 +120,4 @@ jobs:
       
       - name: Publish to npm
         if: ${{ github.event.inputs.publish_to_npm == 'true' }}
-        run: npm publish --access public --provenance --tag ${{ steps.prerelease.outputs.npm_tag }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --tag ${{ steps.prerelease.outputs.npm_tag }}

@@ -18,7 +18,8 @@
 			"Bash(gh api:*)",
 			"WebFetch(domain:caret.so)",
 			"Bash(grep:*)",
-			"Bash(python3:*)"
+			"Bash(python3:*)",
+			"WebFetch(domain:docs.npmjs.com)"
 		],
 		"deny": []
 	}
